@@ -1,4 +1,10 @@
 <?php
+/***
+ * 
+ * COD3D BY D3VBL4CK
+ * 
+ * 
+ */
 class CurlX
 {
     static $ch, $cookiefile, $response, $info, $error_code, $error_string;
@@ -194,3 +200,9 @@ class CurlX
 }
 
 $requests = new CurlX;
+/***
+ * 
+ * COD3D BY D3VBL4CK
+ * 
+ * 
+ */
