@@ -17,7 +17,7 @@ class CurlX
     {
         curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
         curl_setopt(self::$ch, CURLOPT_PROXYTYPE, $sock['sock_type']);
-        curl_setopt(self::$ch, CURLOPT_PROXY, $sock['sock']);
+        curl_setopt(self::$ch, CURLOPT_PROXY, $sock['proxy']);
     }
 
     static function proxy($proxy)
