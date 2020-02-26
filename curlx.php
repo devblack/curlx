@@ -29,9 +29,9 @@ class CurlX
     static function proxy($proxy)
     {
         list($proxy, $port) = explode(":", $proxy['proxy']);
-        curl_setopt($this->ch, CURLOPT_HTTPPROXYTUNNEL, true);
-        curl_setopt($this->ch, CURLOPT_PROXY, $proxy);
-        curl_setopt($this->ch, CURLOPT_PROXYPORT, $port);
+        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
+        curl_setopt(self::$ch, CURLOPT_PROXY, $proxy);
+        curl_setopt(self::$ch, CURLOPT_PROXYPORT, $port);
     }
     
     static function autoP($proxy)
