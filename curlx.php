@@ -34,6 +34,13 @@ class CurlX
         curl_setopt(self::$ch, CURLOPT_PROXYPORT, $port);
     }
     
+    static function randProxy()
+    {
+        //this function get a rand proxy from proxys.txt att: b4sh;
+        $proxy_ar = file("proxys.txt");
+        return $proxy_ar[rand(0, (count($proxy_ar) - 1))];
+    }
+    
     static function autoP($proxy)
     {
         if($proxy['type'] == "sock") {
