@@ -13,10 +13,8 @@ GET and POST Syntax
 --------
 
 ```php
-# GET
 CurlX::get("https://api.myip.com/", $headers, $cookie, $server);
 
-# POST
 CurlX::post("https://api.myip.com/", $data, $headers, $cookie, $server);
 ```
 
@@ -24,21 +22,18 @@ HTTP TUNNEL configuration - Proxy, Socks, Luminati Rotation, Apify Rotation
 --------
 
 ```php
-#Proxy valid syntax
 $server = [
     'TYPE' => "PROXY",
     'PROXY_TYPE' => 'https',#Or http
     'PROXY' => "47.254.145.99:3128"
 ];
 
-#Socks valid syntax
 $server = [
     'TYPE' => "SOCKS",
     'SOCK_TYPE' => "socks5", #Or socks4
     'SOCK' => "192.169.215.124:3050"
 ];
 
-#Luminati valid syntax
 $server = [
     'TYPE' => "LUMINATI",
     'USERNAME' => "lum-customer-hl_876f552a-zone-static",#lum-customer-CUSTOMER-zone-static
@@ -47,7 +42,6 @@ $server = [
     'SESSION' => mt_rand()
 ];
 
-#Apify valid syntax
 $server = [
     'TYPE' => "APIFY",
     'PASSWORD' => "my_ultra_secret_password"
