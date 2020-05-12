@@ -147,12 +147,16 @@ Other functions
 --------
 
 ```php
+    //get a rand proxy from proxies.txt
+    CurlX::RandProxy();
+
     //show all data process|errors of the request
     CurlX::debug();
 
     //return a string by two strings
     $string = "curlx is the best for web scraping";
-    CurlX::ParseString("")
+    CurlX::ParseString($string, "curlx", "scraping")
+    //output: is the best for web
 ```
 Features
 --------
