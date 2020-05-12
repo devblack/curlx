@@ -1,82 +1,175 @@
 <?php
-/***
- * 
+/**
+ * CurlX Lib - v0.0.2
+ *
  * COD3D BY D3VBL4CK
- * 
- * 
  */
 class CurlX
 {
-    static $ch, $cookiefile, $response, $info, $error_code, $error_string;
+    /**
+     * private access to response
+     * @var response
+     */
+    private static $response;
 
-    static function prepare($url)
-    {
+    /**
+     * public access to info args of requests
+     * @var info
+     */
+    private static $info;
+
+    /**
+     * private and global var
+     * @var ch
+     */
+    private static $ch;
+
+    /**
+     * private cookie-file var
+     * @var cookiefile
+     */
+    private static $cookiefile;
+
+    /**
+     * requests error number, example: 5
+     * @var error_code
+     */
+    private static $error_code;
+
+    /**
+     * requests error string, example: CURLE_COULDNT_RESOLVE_PROXY
+     * @var error_string
+     */
+    private static $error_string;
+
+    /**
+     * function prepare, basic curl_init for requests
+     * @param url
+     * @return void
+     */
+    private static function prepare(string $url) {
         self::$ch = curl_init($url);
     }
 
-    static function header($header)
-    {
+    /**
+     * function header, set a header for request structure
+     * @param header
+     * @return void
+     */
+    private static function header(array $header) {
         curl_setopt(self::$ch, CURLOPT_HTTPHEADER, $header);
     }
 
-    static function socks($sock)
-    {
+    /**
+     *  function sock, set a SOCK for request structure
+     * @param args
+     * @return void
+     */
+    private static function sock(array $args) {
         curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
-        curl_setopt(self::$ch, CURLOPT_PROXYTYPE, $sock['sock_type']);
-        curl_setopt(self::$ch, CURLOPT_PROXY, $sock['proxy']);
+        curl_setopt(self::$ch, CURLOPT_PROXYTYPE, $args['SOCK_TYPE']);
+        curl_setopt(self::$ch, CURLOPT_PROXY, $args['SOCK']);
     }
 
-    static function proxy($proxy)
-    {
-        list($proxy, $port) = explode(":", $proxy['proxy']);
+    /**
+     * function proxy, set a PROXY for request structure
+     * @param args
+     * @return void
+     */
+    private static function proxy(array $args) {
+        list($ip, $port) = explode(":", $args['PROXY']);
         curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
-        curl_setopt(self::$ch, CURLOPT_PROXY, $proxy);
+        curl_setopt(self::$ch, CURLOPT_PROXY, $ip);
         curl_setopt(self::$ch, CURLOPT_PROXYPORT, $port);
     }
-    
-    static function randProxy()
-    {
-        //this function get a rand proxy from proxys.txt att: b4sh;
-        $proxy_ar = file("proxys.txt");
-        return $proxy_ar[rand(0, (count($proxy_ar) - 1))];
+
+    /**
+     * function luminati, set a luminati auto-router proxy configuration
+     * @param args
+     * @return void
+     */
+    private static function luminati(array $args) {
+        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
+        curl_setopt(self::$ch, CURLOPT_PROXY, 'http://zproxy.lum-superproxy.io:22225');
+        curl_setopt(
+            self::$ch, CURLOPT_PROXYUSERPWD,
+            "{$args['USERNAME']}-route_err-pass_dyn-country-{$args['COUNTRY']}-session-{$args['SESSION']}:{$args['PASSWORD']}"
+        );
     }
-    
-    static function autoP($proxy)
-    {
-        if($proxy['type'] == "sock") {
-            self::socks($sock);
-        } else {
-            self::proxy($proxy);
+
+    /**
+     * function apify, set a apify auto-router proxy configuration
+     * @param args
+     * @return void
+     */
+    private static function apify(array $args) {
+        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
+        curl_setopt(self::$ch, CURLOPT_PROXY, "http://proxy.apify.com:8000");
+        curl_setopt(self::$ch, CURLOPT_PROXYUSERPWD, "auto:{$args['PASSWORD']}");
+    }
+
+    /**
+     * function RandProxy, get a rand proxy from proxies.txt
+     * @return proxy
+     */
+    public static function RandProxy() {
+        $proxy = file("proxies.txt");
+        return $proxy[rand(0, (count($proxy) - 1))];
+    }
+
+    /**
+     * function AutoRouter, detect the tunnel configuration
+     * @param args
+     * @return void
+     */
+    private static function AutoRouter($args) {
+        switch (strtoupper($args['TYPE'])) {
+            case 'SOCK':
+                self::sock($args);
+            break;
+            case 'PROXY':
+                self::proxy($args);
+            break;
+            case 'LUMINATI':
+                self::luminati($args);
+            break;
+            case 'APIFY':
+                self::apify($args);
+            break;
         }
     }
 
-    static function cookies($file)
-    {
-        self::$cookiefile = getcwd().$file;
+    /**
+     * function cookies, created a file in the temp dir and saved it
+     * @param file
+     * @return void
+     */
+    private static function cookies(string $file) {
+        self::$cookiefile = sys_get_temp_dir."/$file.txt";
         curl_setopt(self::$ch, CURLOPT_COOKIEJAR, self::$cookiefile);
         curl_setopt(self::$ch, CURLOPT_COOKIEFILE, self::$cookiefile);
     }
 
-    static function run()
+    /**
+     * function deleteCookie, this function can delete the current cookie file of the current request
+     * @return bool
+     */
+    public static function deleteCookie()
     {
-        self::$response = curl_exec(self::$ch);
-        self::$info = curl_getinfo(self::$ch);
-
-        // Request failed
-        if (self::$response === FALSE) {
-            self::$error_code = curl_errno(self::$ch);
-            self::$error_string = curl_error(self::$ch);
-
-            curl_close(self::$ch);
-
-            return self::$error_string;
-        } else {
-            curl_close(self::$ch);
-            return self::$response;
-        }
+        unlink(self::$cookiefile);
     }
 
-    static function get($url, $data=NULL, $headers=NULL, $proxy=NULL, $cookie=NULL)
+    /**
+     * function get, this function send a get request with custom headers, cookies and server tunnel
+     *
+     * @param url
+     * @param headers
+     * @param cookie
+     * @param server
+     *
+     * @return response|error_string
+     */
+    public static function get(string $url, array $headers=NULL, string $cookie=NULL, array $server=NULL)
     {
         $default = array(
             CURLOPT_RETURNTRANSFER => true,         // return web page
@@ -90,14 +183,14 @@ class CurlX
         );
 
         self::prepare($url);
-        
+
         curl_setopt_array(self::$ch, $default);
 
         if (!empty($headers) && is_array($headers))
             self::header($headers);
 
-        if (!empty($proxy) && is_array($proxy))
-            self::autoP($proxy);
+        if (!empty($server) && is_array($server))
+            self::AutoRouter($server);
 
         if (!empty($cookie))
             self::cookies($cookie);
@@ -105,7 +198,18 @@ class CurlX
         return self::run();
     }
 
-    static function post($url, $data=NULL, $headers=NULL, $proxy=NULL, $cookie=NULL)
+    /**
+     * function post, this function send a post request with custom post data, headers, cookies and server tunnel
+     *
+     * @param url
+     * @param data
+     * @param headers
+     * @param cookie
+     * @param server
+     *
+     * @return response|error_string
+     */
+    public static function post(string $url, $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL)
     {
         $default = array(
             CURLOPT_RETURNTRANSFER => true,         // return web page
@@ -121,14 +225,14 @@ class CurlX
         );
 
         self::prepare($url);
-        
+
         curl_setopt_array(self::$ch, $default);
 
         if (!empty($headers) && is_array($headers))
             self::header($headers);
 
-        if (!empty($proxy) && is_array($proxy))
-            self::autoP($proxy);
+        if (!empty($server) && is_array($server))
+            self::AutoRouter($server);
 
         if (!empty($cookie))
             self::cookies($cookie);
@@ -136,7 +240,44 @@ class CurlX
         return self::run();
     }
 
-    static function debug()
+    /**
+     * function run, send the request structure
+     * @return response|error_string
+     */
+    private static function run() {
+        self::$response = curl_exec(self::$ch);
+        self::$info = curl_getinfo(self::$ch);
+
+        // Request failed
+        if (self::$response === FALSE) {
+            self::$error_code = curl_errno(self::$ch);
+            self::$error_string = curl_error(self::$ch);
+
+            curl_close(self::$ch);
+
+            return (object) [
+                'status_code' => self::$info['http_code'],
+                'headers'  => self::$info,
+                'body'     => self::$error_string,
+                'errno'    => self::$error_code,
+                'error'    => self::$error_string
+            ];
+        } else {
+            curl_close(self::$ch);
+
+            return (object) [
+                'status_code' => self::$info['http_code'],
+                'headers'  => self::$info,
+                'body'     => self::$response
+            ];
+        }
+    }
+
+    /**
+     * function debug, this function show all data process|errors of the request
+     * @return information|errors
+     */
+    public static function debug()
     {
         echo "=============================================<br/>\n";
         echo "<h2>REQUESTS DEBUG</h2>\n";
@@ -158,12 +299,20 @@ class CurlX
         echo "</pre>";
     }
 
-    static function cleanData($string, $start, $end)
+    /**
+     * function ParseString, this function can split a string by two strings
+     * @return string
+     */
+    public static function ParseString(string $string, string $start, string $end)
     {
         return explode($end, explode($start, $string)[1])[0];
     }
 
-    static function userAgent()
+    /**
+     * function userAgent, this function return a random user agent
+     * @return string
+     */
+    private static function userAgent()
     {
         $uas = [
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
@@ -201,15 +350,11 @@ class CurlX
             "Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.1.0.346 Mobile Safari/534.11+",
             "Mozilla/5.0 (BlackBerry; U; BlackBerry 9860; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.0.0.254 Mobile Safari/534.11+"
         ];
-
         return $uas[array_rand($uas)];
     }
 }
 
-$requests = new CurlX;
+new CurlX;
 /***
- * 
  * COD3D BY D3VBL4CK
- * 
- * 
  */
