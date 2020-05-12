@@ -9,6 +9,7 @@ and parameters with simple arrays, and access the response data in the same way.
 [LUMINATI]: https://luminati.io
 [APIFY]: https://apify.com
 
+
 GET and POST Syntax
 --------
 
@@ -17,6 +18,7 @@ CurlX::get("https://api.myip.com/", $headers, $cookie, $server);
 
 CurlX::post("https://api.myip.com/", $data, $headers, $cookie, $server);
 ```
+
 
 HTTP TUNNEL configuration - Proxy, Socks, Luminati Rotation, Apify Rotation
 --------
@@ -47,6 +49,7 @@ $server = [
     'PASSWORD' => "my_ultra_secret_password"
 ];
 ```
+
 
 GET syntax with Custom Headers, Cookie Name, Proxy Server
 --------
@@ -88,6 +91,7 @@ var_dump($test3->headers['content-type']);
 var_dump($test3->body);
 // string(51) "{...}"
 ```
+
 
 POST syntax with Custom Headers, Cookie Name, Proxy Server
 --------
@@ -136,6 +140,7 @@ var_dump($test4->headers['content-type']);
 var_dump($test4->body);
 // string(51) "{...}"
 ```
+
 
 Features
 --------
