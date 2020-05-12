@@ -61,14 +61,13 @@ class CurlX
     }
 
     /**
-     *  function sock, set a SOCK for request structure
+     *  function socks, set a SOCKS for request structure
      * @param args
      * @return void
      */
-    private static function sock(array $args) {
+    private static function socks(array $args) {
+        curl_setopt(self::$ch, CURLOPT_PROXY, "{$args['SOCK_TYPE']}://{$args['SOCK']}");
         curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
-        curl_setopt(self::$ch, CURLOPT_PROXYTYPE, $args['SOCK_TYPE']);
-        curl_setopt(self::$ch, CURLOPT_PROXY, $args['SOCK']);
     }
 
     /**
@@ -77,10 +76,8 @@ class CurlX
      * @return void
      */
     private static function proxy(array $args) {
-        list($ip, $port) = explode(":", $args['PROXY']);
+        curl_setopt(self::$ch, CURLOPT_PROXY, "{$args['PROXY_TYPE']}://{$args['PROXY']}");
         curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
-        curl_setopt(self::$ch, CURLOPT_PROXY, $ip);
-        curl_setopt(self::$ch, CURLOPT_PROXYPORT, $port);
     }
 
     /**
@@ -89,7 +86,6 @@ class CurlX
      * @return void
      */
     private static function luminati(array $args) {
-        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
         curl_setopt(self::$ch, CURLOPT_PROXY, 'http://zproxy.lum-superproxy.io:22225');
         curl_setopt(
             self::$ch, CURLOPT_PROXYUSERPWD,
@@ -103,7 +99,6 @@ class CurlX
      * @return void
      */
     private static function apify(array $args) {
-        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
         curl_setopt(self::$ch, CURLOPT_PROXY, "http://proxy.apify.com:8000");
         curl_setopt(self::$ch, CURLOPT_PROXYUSERPWD, "auto:{$args['PASSWORD']}");
     }
@@ -124,8 +119,8 @@ class CurlX
      */
     private static function AutoRouter($args) {
         switch (strtoupper($args['TYPE'])) {
-            case 'SOCK':
-                self::sock($args);
+            case 'SOCKS':
+                self::socks($args);
             break;
             case 'PROXY':
                 self::proxy($args);
@@ -151,11 +146,10 @@ class CurlX
     }
 
     /**
-     * function deleteCookie, this function can delete the current cookie file of the current request
+     * function deleteCookie, this function delete the current cookie file of the current request
      * @return bool
      */
-    public static function deleteCookie()
-    {
+    public static function deleteCookie() {
         unlink(self::$cookiefile);
     }
 
@@ -169,8 +163,7 @@ class CurlX
      *
      * @return response|error_string
      */
-    public static function get(string $url, array $headers=NULL, string $cookie=NULL, array $server=NULL)
-    {
+    public static function get(string $url, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
         $default = array(
             CURLOPT_RETURNTRANSFER => true,         // return web page
             CURLOPT_HEADER         => false,        // don't return headers
@@ -209,8 +202,7 @@ class CurlX
      *
      * @return response|error_string
      */
-    public static function post(string $url, $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL)
-    {
+    public static function post(string $url, $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
         $default = array(
             CURLOPT_RETURNTRANSFER => true,         // return web page
             CURLOPT_HEADER         => false,        // don't return headers
@@ -277,8 +269,7 @@ class CurlX
      * function debug, this function show all data process|errors of the request
      * @return information|errors
      */
-    public static function debug()
-    {
+    public static function debug() {
         echo "=============================================<br/>\n";
         echo "<h2>REQUESTS DEBUG</h2>\n";
         echo "=============================================<br/>\n";
@@ -303,8 +294,7 @@ class CurlX
      * function ParseString, this function can split a string by two strings
      * @return string
      */
-    public static function ParseString(string $string, string $start, string $end)
-    {
+    public static function ParseString(string $string, string $start, string $end) {
         return explode($end, explode($start, $string)[1])[0];
     }
 
@@ -312,8 +302,7 @@ class CurlX
      * function userAgent, this function return a random user agent
      * @return string
      */
-    private static function userAgent()
-    {
+    private static function userAgent() {
         $uas = [
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
             "Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36",
