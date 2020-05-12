@@ -143,6 +143,17 @@ var_dump($test4->body);
 // string(51) "{...}"
 ```
 
+Other functions
+--------
+
+```php
+    //show all data process|errors of the request
+    CurlX::debug();
+
+    //return a string by two strings
+    $string = "curlx is the best for web scraping";
+    CurlX::ParseString("")
+```
 Features
 --------
 
