@@ -74,9 +74,9 @@ $test2 = CurlX::get("https://api.myip.com/", $headers, $cookie);
 
 #GET with Headers, Cookie and Proxy Tunnel
 $server = [
-    'TYPE' => "PROXY",
-    'PROXY_TYPE' => 'https',#Or http
-    'PROXY' => "47.254.145.99:3128"
+    'METHOD' => "TUNNEL",
+    'TYPE' => 'http',# OR HTTPS
+    'SERVER' => "47.254.145.99:3128"
 ];
 $test3 = CurlX::get("https://api.myip.com/", $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only with you use the $cookie parameter.
@@ -122,9 +122,9 @@ $test3 = CurlX::post("http://httpbin.org/post", $data, $headers, $cookie);
 
 #POST with Json-Data, Custom Headers, Cookie and Proxy Tunnel
 $server = [
-    'TYPE' => "PROXY",
-    'PROXY_TYPE' => 'https',#Or http
-    'PROXY' => "47.254.145.99:3128"
+    'METHOD' => "TUNNEL",
+    'TYPE' => 'http',# OR HTTPS
+    'SERVER' => "47.254.145.99:3128"
 ];
 $test4 = CurlX::post("http://httpbin.org/post", $data, $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only with you use the $cookie parameter.
