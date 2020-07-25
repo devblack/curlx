@@ -61,22 +61,12 @@ class CurlX
     }
 
     /**
-     *  function socks, set a SOCKS for request structure
+     *  function tunnel, support HTTP/S, SOCKS4, SOCKS5 for request structure
      * @param args
      * @return void
      */
-    private static function socks(array $args) {
-        curl_setopt(self::$ch, CURLOPT_PROXY, "{$args['SOCK_TYPE']}://{$args['SOCK']}");
-        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
-    }
-
-    /**
-     * function proxy, set a PROXY for request structure
-     * @param args
-     * @return void
-     */
-    private static function proxy(array $args) {
-        curl_setopt(self::$ch, CURLOPT_PROXY, "{$args['PROXY_TYPE']}://{$args['PROXY']}");
+    private static function tunnel(array $args) {
+        curl_setopt(self::$ch, CURLOPT_PROXY, "{$args['TYPE']}://{$args['SERVER']}");
         curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
     }
 
@@ -118,12 +108,9 @@ class CurlX
      * @return void
      */
     private static function AutoRouter($args) {
-        switch (strtoupper($args['TYPE'])) {
-            case 'SOCKS':
-                self::socks($args);
-            break;
-            case 'PROXY':
-                self::proxy($args);
+        switch (strtoupper($args['METHOD'])) {
+            case 'TUNNEL':
+                self::tunnel($args);
             break;
             case 'LUMINATI':
                 self::luminati($args);

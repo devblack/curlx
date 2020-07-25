@@ -26,21 +26,21 @@ HTTP TUNNEL configuration - Proxy, Socks, Luminati Rotation, Apify Rotation
 ```php
 #Proxy valid syntax
 $server = [
-    'TYPE' => "PROXY",
-    'PROXY_TYPE' => 'https',#Or http
-    'PROXY' => "47.254.145.99:3128"
+    'METHOD' => "TUNNEL",
+    'TYPE' => 'http',# OR HTTPS
+    'SERVER' => "47.254.145.99:3128"
 ];
 
 #Socks valid syntax
 $server = [
-    'TYPE' => "SOCKS",
-    'SOCK_TYPE' => "socks5", #Or socks4
-    'SOCK' => "192.169.215.124:3050"
+    'METHOD' => "TUNNEL",
+    'TYPE' => "socks5", # OR SOCKS4
+    'SERVER' => "192.169.215.124:3050"
 ];
 
 #Luminati valid syntax
 $server = [
-    'TYPE' => "LUMINATI",
+    'METHOD' => "LUMINATI",
     'USERNAME' => "lum-customer-hl_876f552a-zone-static",#lum-customer-CUSTOMER-zone-static
     'PASSWORD' => "my_ultra_secret_password",
     'COUNTRY' => "RU",
@@ -49,7 +49,7 @@ $server = [
 
 #Apify valid syntax
 $server = [
-    'TYPE' => "APIFY",
+    'METHOD' => "APIFY",
     'PASSWORD' => "my_ultra_secret_password"
 ];
 ```
