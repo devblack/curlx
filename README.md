@@ -59,18 +59,18 @@ GET syntax with Custom Headers, Cookie Name, Proxy Server
 
 ```php
 #Simple GET
-$test0 = CurlX::get("https://api.myip.com/");
+$test0 = CurlX::get("http://httpbin.org/get");
 
 #GET with Custom Headers
 $headers = array(
     'Host: api.myip.com',
     'my-custom-header: my-header-value'
 );
-$test1 = CurlX::get("https://api.myip.com/", $headers);
+$test1 = CurlX::get("http://httpbin.org/get", $headers);
 
 #GET with Headers and Cookie
 $cookie = uniqid('my_cookie_');
-$test2 = CurlX::get("https://api.myip.com/", $headers, $cookie);
+$test2 = CurlX::get("http://httpbin.org/get", $headers, $cookie);
 
 #GET with Headers, Cookie and Proxy Tunnel
 $server = [
@@ -78,7 +78,7 @@ $server = [
     'TYPE' => 'http',# OR HTTPS
     'SERVER' => "47.254.145.99:3128"
 ];
-$test3 = CurlX::get("https://api.myip.com/", $headers, $cookie, $server);
+$test3 = CurlX::get("http://httpbin.org/get", $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only with you use the $cookie parameter.
 CurlX::deleteCookie();
 
