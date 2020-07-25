@@ -43,6 +43,21 @@ class CurlX
     private static $error_string;
 
     /**
+     * Default Options for request structure
+     */
+    private static $default = [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER         => false,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_AUTOREFERER    => true,
+        CURLOPT_CONNECTTIMEOUT => 70,
+        CURLOPT_TIMEOUT        => 70,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_VERBOSE => 1
+    ];
+
+    /**
      * function prepare, basic curl_init for requests
      * @param url
      * @return void
@@ -66,8 +81,10 @@ class CurlX
      * @return void
      */
     private static function tunnel(array $args) {
-        curl_setopt(self::$ch, CURLOPT_PROXY, "{$args['TYPE']}://{$args['SERVER']}");
-        curl_setopt(self::$ch, CURLOPT_HTTPPROXYTUNNEL, true);
+        curl_setopt_array(self::$ch, [
+            CURLOPT_PROXY => "{$args['TYPE']}://{$args['SERVER']}",
+            CURLOPT_HTTPPROXYTUNNEL => true
+        ]);
     }
 
     /**
@@ -76,11 +93,10 @@ class CurlX
      * @return void
      */
     private static function luminati(array $args) {
-        curl_setopt(self::$ch, CURLOPT_PROXY, 'http://zproxy.lum-superproxy.io:22225');
-        curl_setopt(
-            self::$ch, CURLOPT_PROXYUSERPWD,
-            "{$args['USERNAME']}-route_err-pass_dyn-country-{$args['COUNTRY']}-session-{$args['SESSION']}:{$args['PASSWORD']}"
-        );
+        curl_setopt_array(self::$ch, [
+            CURLOPT_PROXY => 'http://zproxy.lum-superproxy.io:22225',
+            CURLOPT_PROXYUSERPWD => "{$args['USERNAME']}-route_err-pass_dyn-country-{$args['COUNTRY']}-session-{$args['SESSION']}:{$args['PASSWORD']}"
+        ]);
     }
 
     /**
@@ -89,8 +105,10 @@ class CurlX
      * @return void
      */
     private static function apify(array $args) {
-        curl_setopt(self::$ch, CURLOPT_PROXY, "http://proxy.apify.com:8000");
-        curl_setopt(self::$ch, CURLOPT_PROXYUSERPWD, "auto:{$args['PASSWORD']}");
+        curl_setopt_array(self::$ch, [
+            CURLOPT_PROXY => 'http://proxy.apify.com:8000',
+            CURLOPT_PROXYUSERPWD => "auto:{$args['PASSWORD']}"
+        ]);
     }
 
     /**
@@ -128,8 +146,10 @@ class CurlX
      */
     private static function cookies(string $file) {
         self::$cookiefile = sys_get_temp_dir."/$file.txt";
-        curl_setopt(self::$ch, CURLOPT_COOKIEJAR, self::$cookiefile);
-        curl_setopt(self::$ch, CURLOPT_COOKIEFILE, self::$cookiefile);
+        curl_setopt_array(self::$ch, [
+            CURLOPT_COOKIEJAR => self::$cookiefile,
+            CURLOPT_COOKIEFILE => self::$cookiefile
+        ]);
     }
 
     /**
@@ -138,6 +158,20 @@ class CurlX
      */
     public static function deleteCookie() {
         unlink(self::$cookiefile);
+    }
+
+    /**
+     * Check parameters
+     */
+    private static function CheckParam(array $headers=NULL, string $cookie=NULL, array $server=NULL) {
+        if (!empty($headers) && is_array($headers))
+            self::header($headers);
+
+        if (!empty($cookie))
+            self::cookies($cookie);
+
+        if (!empty($server) && is_array($server))
+            self::AutoRouter($server);
     }
 
     /**
@@ -151,29 +185,15 @@ class CurlX
      * @return response|error_string
      */
     public static function get(string $url, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
-        $default = array(
-            CURLOPT_RETURNTRANSFER => true,         // return web page
-            CURLOPT_HEADER         => false,        // don't return headers
-            CURLOPT_FOLLOWLOCATION => true,         // follow redirects
-            CURLOPT_USERAGENT      => self::userAgent(),     // who am i
-            CURLOPT_CONNECTTIMEOUT => 120,          // timeout on connect
-            CURLOPT_TIMEOUT        => 120,          // timeout on response
-            CURLOPT_SSL_VERIFYHOST => 0,            // don't verify ssl
-            CURLOPT_SSL_VERIFYPEER => false
-        );
+        $options = array_replace($self::$default, [
+            CURLOPT_USERAGENT => self::userAgent()
+        ]);
 
         self::prepare($url);
 
-        curl_setopt_array(self::$ch, $default);
+        curl_setopt_array(self::$ch, $options);
 
-        if (!empty($headers) && is_array($headers))
-            self::header($headers);
-
-        if (!empty($server) && is_array($server))
-            self::AutoRouter($server);
-
-        if (!empty($cookie))
-            self::cookies($cookie);
+        self::CheckParam($headers, $cookie, $server);
 
         return self::run();
     }
@@ -189,32 +209,72 @@ class CurlX
      *
      * @return response|error_string
      */
-    public static function post(string $url, $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
-        $default = array(
-            CURLOPT_RETURNTRANSFER => true,         // return web page
-            CURLOPT_HEADER         => false,        // don't return headers
-            CURLOPT_FOLLOWLOCATION => true,         // follow redirects
-            CURLOPT_USERAGENT      => self::userAgent(),     // who am i
-            CURLOPT_CONNECTTIMEOUT => 120,          // timeout on connect
-            CURLOPT_TIMEOUT        => 120,          // timeout on response
-            CURLOPT_POST           => 1,            // i am sending post data
-            CURLOPT_POSTFIELDS     => (is_array($data)) ? json_encode($data):$data,
-            CURLOPT_SSL_VERIFYHOST => 0,            // don't verify ssl
-            CURLOPT_SSL_VERIFYPEER => false
-        );
+    public static function post(string $url, mixed $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
+        $options = array_replace(self::$default,[
+            CURLOPT_USERAGENT      => self::userAgent(),
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => is_array($data) ? json_encode($data) : $data
+        ]);
 
         self::prepare($url);
 
-        curl_setopt_array(self::$ch, $default);
+        curl_setopt_array(self::$ch, $options);
 
-        if (!empty($headers) && is_array($headers))
-            self::header($headers);
+        self::CheckParam($headers, $cookie, $server);
 
-        if (!empty($server) && is_array($server))
-            self::AutoRouter($server);
+        return self::run();
+    }
 
-        if (!empty($cookie))
-            self::cookies($cookie);
+    /**
+     * function put, this function send a post request with custom post data, headers, cookies and server tunnel
+     *
+     * @param url
+     * @param data
+     * @param headers
+     * @param cookie
+     * @param server
+     *
+     * @return response|error_string
+     */
+    public static function put(string $url, mixed $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
+        $options = array_replace(self::$default, [
+            CURLOPT_USERAGENT      => self::userAgent(),
+            CURLOPT_CUSTOMREQUEST  => "PUT",
+            CURLOPT_POSTFIELDS     => is_array($data) ? json_encode($data) : $data,
+        ]);
+
+        self::prepare($url);
+
+        curl_setopt_array(self::$ch, $options);
+
+        self::CheckParam($headers, $cookie, $server);
+
+        return self::run();
+    }
+
+    /**
+     * function delete, this function send a post request with custom post data, headers, cookies and server tunnel
+     *
+     * @param url
+     * @param data
+     * @param headers
+     * @param cookie
+     * @param server
+     *
+     * @return response|error_string
+     */
+    public static function delete(string $url, mixed $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
+        $options = array_replace(self::$default, [
+            CURLOPT_USERAGENT      => self::userAgent(),
+            CURLOPT_CUSTOMREQUEST  => 'DELETE',
+            CURLOPT_POSTFIELDS     => is_array($data) ? json_encode($data) : $data,
+        ]);
+
+        self::prepare($url);
+
+        curl_setopt_array(self::$ch, $options);
+
+        self::CheckParam($headers, $cookie, $server);
 
         return self::run();
     }

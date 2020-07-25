@@ -3,7 +3,7 @@ CurlX - A curl basic library for PHP
 
 CurlX is a HTTP basic library written in PHP, for human beings and has no dependencies, working with PHP 7.3+.
 
-CurlX allows you to send **GET** and **POST** HTTP requests. You can add headers, form data, json data,
+CurlX allows you to send **GET**, **POST**, **PUT**, **DELETE** HTTP requests. You can add headers, form data, json data,
 and parameters with simple arrays, and access the response data in the same way. You can add a HTTP TUNNEL with SOCKS, PROXY, [LUMINATI][] IP ROTATION and [APIFY][] IP ROTATION.
 
 [LUMINATI]: https://luminati.io
