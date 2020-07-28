@@ -185,7 +185,7 @@ class CurlX
      * @return response|error_string
      */
     public static function get(string $url, array $headers=NULL, string $cookie=NULL, array $server=NULL) {
-        $options = array_replace($self::$default, [
+        $options = array_replace(self::$default, [
             CURLOPT_USERAGENT => self::userAgent()
         ]);
 
