@@ -187,7 +187,7 @@ More?
 --------
 - More examples in [TESTING][] dir.
 
-[TESTING]: https://github.com/devblack/curlx/testing/
+[TESTING]: https://github.com/devblack/curlx/tree/master/testing
 
 Features
 --------
