@@ -159,6 +159,9 @@ Other functions
 --------
 
 ```php
+    // Set a custom option to current CURL structure
+    $CurlX::SetOpt([CURLOPT_HTTPAUTH => CURLAUTH_BEARER]);
+
     // Get a rand line from text file
     $CurlX::GetRandVal('proxies.txt');
     // Output: 202.137.25.8:8080
