@@ -63,25 +63,25 @@ GET syntax with Custom Headers, Cookie Name, Proxy Server
 
 ```php
 #Simple GET
-$test0 = $CurlX::get("http://httpbin.org/get");
+$test0 = $CurlX::Get("http://httpbin.org/get");
 
 #GET with Custom Headers
 $headers = array(
     'Host: api.myip.com',
     'my-custom-header: my-header-value'
 );
-$test1 = $CurlX::get("http://httpbin.org/get", $headers);
+$test1 = $CurlX::Get("http://httpbin.org/get", $headers);
 
 #GET with Headers and Cookie
 $cookie = uniqid();
-$test2 = $CurlX::get("http://httpbin.org/get", $headers, $cookie);
+$test2 = $CurlX::Get("http://httpbin.org/get", $headers, $cookie);
 
 #GET with Headers, Cookie and Proxy Tunnel
 $server = [
     'METHOD' => "TUNNEL",
     'SERVER' => "47.254.145.99:3128"
 ];
-$test3 = $CurlX::get("http://httpbin.org/get", $headers, $cookie, $server);
+$test3 = $CurlX::Get("http://httpbin.org/get", $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only when you use the $cookie parameter.
 $CurlX::deleteCookie();
 
@@ -107,32 +107,32 @@ POST syntax with Custom Headers, Cookie Name, Proxy Server
 
 ```php
 #Simple POST with NULL data
-$test0 = $CurlX::post("http://httpbin.org/post");
+$test0 = $CurlX::Post("http://httpbin.org/post");
 
 #POST with Data-form and Custom Headers
 $headers = array(
     'Host: httpbin.org',
     'my-custom-header: my-header-value'
 );
-$test1 = $CurlX::post("http://httpbin.org/post", "test_ID=666&hello=mom", $headers);
+$test1 = $CurlX::Post("http://httpbin.org/post", "test_ID=666&hello=mom", $headers);
 
 #POST with Json-Data and Custom Headers
 $data = array(
     'hello' => "mom",
     'key' => "value"
 );
-$test2 = $CurlX::post("http://httpbin.org/post", $data, $headers);
+$test2 = $CurlX::Post("http://httpbin.org/post", $data, $headers);
 
 #POST with Custom-Data, Custom Headers and Cookie
 $cookie = uniqid();
-$test3 = $CurlX::post("http://httpbin.org/post", $data, $headers, $cookie);
+$test3 = $CurlX::Post("http://httpbin.org/post", $data, $headers, $cookie);
 
 #POST with Json-Data, Custom Headers, Cookie and Proxy Tunnel
 $server = [
     'METHOD' => "TUNNEL",
     'SERVER' => "47.254.145.99:3128"
 ];
-$test4 = $CurlX::post("http://httpbin.org/post", $data, $headers, $cookie, $server);
+$test4 = $CurlX::Post("http://httpbin.org/post", $data, $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only when you use the $cookie parameter.
 $CurlX::deleteCookie();
 
