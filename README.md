@@ -186,6 +186,7 @@ Other functions
 More?
 --------
 - More examples in [TESTING][] dir.
+
 [TESTING]: https://github.com/devblack/curlx/testing/
 
 Features
