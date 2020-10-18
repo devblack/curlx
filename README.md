@@ -1,56 +1,60 @@
-CurlX - A curl basic library for PHP
+CurlX - A curl basic library for PHP7.3+
 ================
 
 CurlX is a HTTP basic library written in PHP, for human beings and has no dependencies, working with PHP 7.3+.
 
-CurlX allows you to send **GET**, **POST**, **PUT**, **DELETE** HTTP requests. You can add headers, form data, json data,
-and parameters with simple arrays, and access the response data in the same way. You can add a HTTP TUNNEL with SOCKS, PROXY, [LUMINATI][] IP ROTATION and [APIFY][] IP ROTATION.
+CurlX allows you to send **GET**, **POST**, **PUT**, **DELETE** AND MORE HTTP METHODS. You can add headers, form data, json data,
+and parameters with simple arrays, and access the response data in the same way. You can add a HTTP TUNNEL with PROXY, server ROTATIONS like [LUMINATI][], [APIFY][], [IPVANISH][].
 
-[LUMINATI]: https://luminati.io
-[APIFY]: https://apify.com
+[LUMINATI]: https://luminati.io/
+[APIFY]: https://apify.com/
+[IPVANISH]: https://www.ipvanish.com/
 
 GET and POST Syntax
 --------
 
 ```php
 # GET
-CurlX::get("https://api.myip.com/", $headers, $cookie, $server);
+$CurlX::Get('https://api.myip.com/');
 
 # POST
-CurlX::post("https://api.myip.com/", $data, $headers, $cookie, $server);
+$CurlX::Post('https://api.myip.com/', 'my_form_id=test&hello=mom');
+
+# CUSTOM
+$CurlX::Custom('https://api.myip.com/', 'HEAD');
+$CurlX::Run();
 ```
 
-HTTP TUNNEL configuration - Proxy, Socks, Luminati Rotation, Apify Rotation
+HTTP TUNNEL configuration - Proxy (http/s, socks4, socks5), Luminati, Apify, IpVanish
 --------
 
 ```php
-#Proxy valid syntax
+# Proxy (http/s, socks4, socks5)
 $server = [
-    'METHOD' => "TUNNEL",
-    'TYPE' => 'http',# OR HTTPS
-    'SERVER' => "47.254.145.99:3128"
-];
-
-#Socks valid syntax
-$server = [
-    'METHOD' => "TUNNEL",
-    'TYPE' => "socks5", # OR SOCKS4
-    'SERVER' => "192.169.215.124:3050"
+    'METHOD' => 'TUNNEL',
+    'SERVER' => '47.254.145.99:3128'
 ];
 
 #Luminati valid syntax
 $server = [
-    'METHOD' => "LUMINATI",
-    'USERNAME' => "lum-customer-hl_876f552a-zone-static",#lum-customer-CUSTOMER-zone-static
-    'PASSWORD' => "my_ultra_secret_password",
-    'COUNTRY' => "RU",
+    'METHOD' => 'LUMINATI',
+    'USERNAME' => 'lum-customer-hl_876f552a-zone-static',#lum-customer-CUSTOMER-zone-static
+    'PASSWORD' => 'my_ultra_secret_password',
+    'COUNTRY' => 'RU',
     'SESSION' => mt_rand()
 ];
 
 #Apify valid syntax
 $server = [
-    'METHOD' => "APIFY",
-    'PASSWORD' => "my_ultra_secret_password"
+    'METHOD' => 'APIFY',
+    'PASSWORD' => 'my_ultra_secret_password'
+];
+
+#IpVanish valid syntax
+$server = [
+    'METHOD' => 'IPVANISH',
+    'SERVER' => 'akl-c12.ipvanish.com',
+    'AUTH'   => 'my_zone_customer_id:my_zone_customer_password'
 ];
 ```
 
@@ -59,31 +63,34 @@ GET syntax with Custom Headers, Cookie Name, Proxy Server
 
 ```php
 #Simple GET
-$test0 = CurlX::get("http://httpbin.org/get");
+$test0 = $CurlX::get("http://httpbin.org/get");
 
 #GET with Custom Headers
 $headers = array(
     'Host: api.myip.com',
     'my-custom-header: my-header-value'
 );
-$test1 = CurlX::get("http://httpbin.org/get", $headers);
+$test1 = $CurlX::get("http://httpbin.org/get", $headers);
 
 #GET with Headers and Cookie
-$cookie = uniqid('my_cookie_');
-$test2 = CurlX::get("http://httpbin.org/get", $headers, $cookie);
+$cookie = uniqid();
+$test2 = $CurlX::get("http://httpbin.org/get", $headers, $cookie);
 
 #GET with Headers, Cookie and Proxy Tunnel
 $server = [
     'METHOD' => "TUNNEL",
-    'TYPE' => 'http',# OR HTTPS
     'SERVER' => "47.254.145.99:3128"
 ];
-$test3 = CurlX::get("http://httpbin.org/get", $headers, $cookie, $server);
-#After all request was complete, you can delete the cookie file, Only with you use the $cookie parameter.
-CurlX::deleteCookie();
+$test3 = $CurlX::get("http://httpbin.org/get", $headers, $cookie, $server);
+#After all request was complete, you can delete the cookie file, Only when you use the $cookie parameter.
+$CurlX::deleteCookie();
+
+# Response status of the request
+var_dump($test3->success);
+// bool(true)
 
 # Status code of the request
-var_dump($test3->status_code);
+var_dump($test3->code);
 // int(200)
 
 # Content type of the request
@@ -100,38 +107,41 @@ POST syntax with Custom Headers, Cookie Name, Proxy Server
 
 ```php
 #Simple POST with NULL data
-$test0 = CurlX::post("http://httpbin.org/post");
+$test0 = $CurlX::post("http://httpbin.org/post");
 
 #POST with Data-form and Custom Headers
 $headers = array(
     'Host: httpbin.org',
     'my-custom-header: my-header-value'
 );
-$test1 = CurlX::post("http://httpbin.org/post", "bla bla", $headers);
+$test1 = $CurlX::post("http://httpbin.org/post", "test_ID=666&hello=mom", $headers);
 
 #POST with Json-Data and Custom Headers
 $data = array(
     'hello' => "mom",
     'key' => "value"
 );
-$test2 = CurlX::post("http://httpbin.org/post", $data, $headers);
+$test2 = $CurlX::post("http://httpbin.org/post", $data, $headers);
 
-#POST with Json-Data, Custom Headers and Cookie
-$cookie = uniqid('my_cookie_');
-$test3 = CurlX::post("http://httpbin.org/post", $data, $headers, $cookie);
+#POST with Custom-Data, Custom Headers and Cookie
+$cookie = uniqid();
+$test3 = $CurlX::post("http://httpbin.org/post", $data, $headers, $cookie);
 
 #POST with Json-Data, Custom Headers, Cookie and Proxy Tunnel
 $server = [
     'METHOD' => "TUNNEL",
-    'TYPE' => 'http',# OR HTTPS
     'SERVER' => "47.254.145.99:3128"
 ];
-$test4 = CurlX::post("http://httpbin.org/post", $data, $headers, $cookie, $server);
-#After all request was complete, you can delete the cookie file, Only with you use the $cookie parameter.
-CurlX::deleteCookie();
+$test4 = $CurlX::post("http://httpbin.org/post", $data, $headers, $cookie, $server);
+#After all request was complete, you can delete the cookie file, Only when you use the $cookie parameter.
+$CurlX::deleteCookie();
+
+# Response status of the request
+var_dump($test3->success);
+// bool(true)
 
 # Status code of the request
-var_dump($test4->status_code);
+var_dump($test4->code);
 // int(200)
 
 # Content type of the request
@@ -147,23 +157,44 @@ Other functions
 --------
 
 ```php
-    //get a rand proxy from proxies.txt
-    CurlX::RandProxy();
+    // Get a rand line from text file
+    $CurlX::GetRandVal('proxies.txt');
+    // Output: 202.137.25.8:8080
 
-    //show all data process|errors of the request
-    CurlX::debug();
+    // Parse a string by two specify strings
+    $str = "curlx is the best for web scraping";
+    $CurlX::ParseString($str, "curlx", "scraping")
+    // Output: is the best for web
 
-    //return a string by two strings
-    $string = "curlx is the best for web scraping";
-    CurlX::ParseString($string, "curlx", "scraping")
-    //output: is the best for web
+    // Clean all spaces from a string
+    $CurlX::CleanString($str);
+    // Output: curlxisthebestforwebscraping
+
+    /**
+     * Show all data process|errors of the request
+     * 
+     * Debug() : now support pretty print to html and json
+     * @param true = json response
+     * @param false = html response
+     * 
+     * Recommended for develop work space
+     * 
+    */
+    $CurlX::Debug(false);
 ```
+
+More?
+--------
+- More examples in [TESTING][] dir.
+[TESTING]: https://github.com/devblack/curlx/testing/
+
 Features
 --------
 
 - International Domains and URLs
-- Custom Tunnel Http with Proxy, Socks, Luminati, Apify
+- Custom Tunnel Http with Proxy, Socks, Luminati, Apify, IpVanish
 - Cookie data reutilization
+- Custom HTTP METHODS
 
 
 Installation
