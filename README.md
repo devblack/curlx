@@ -10,7 +10,7 @@ and parameters with simple arrays, and access the response data in the same way.
 [APIFY]: https://apify.com/
 [IPVANISH]: https://www.ipvanish.com/
 
-GET and POST Syntax
+GET, POST AND CUSTOM Syntax
 --------
 
 ```php
