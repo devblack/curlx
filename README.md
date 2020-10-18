@@ -209,6 +209,7 @@ To install the source code:
 And include it in your scripts:
 
     require_once 'CurlX.php';
+    $CurlX = new CurlX;
 
 
 ### Install source from zip/tarball
