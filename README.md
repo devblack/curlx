@@ -96,7 +96,7 @@ var_dump($test3->code);
 // int(200)
 
 # Content type of the request
-var_dump($test3->headers['content-type']);
+var_dump($test3->headers['response_headers']['content-type']);
 // string(24) "text/html; charset=UTF-8"
 
 # Body response of the request
@@ -147,7 +147,7 @@ var_dump($test4->code);
 // int(200)
 
 # Content type of the request
-var_dump($test4->headers['content-type']);
+var_dump($test4->headers['response_headers']['content-type']);
 // string(24) "..."
 
 # Body response of the request
