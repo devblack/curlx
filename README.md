@@ -1,4 +1,4 @@
-A curl basic library for PHP7.3+
+CurlX 0.0.4
 ================
 
 CurlX is a HTTP basic library written in PHP, for human beings and has no dependencies, working with PHP 7.3+.
@@ -27,17 +27,17 @@ $CurlX::Custom('https://api.myip.com/', 'HEAD');
 $CurlX::Run();
 ```
 
-HTTP TUNNEL SYNTAX - Proxy (http/s, socks4, socks5), Luminati, Apify, IpVanish
+HTTP TUNNEL SYNTAX
 --------
 
 ```php
-# Proxy (http/s, socks4, socks5)
+# PRROXY (http/s, socks4, socks5)
 $server = [
     'METHOD' => 'TUNNEL',
     'SERVER' => '47.254.145.99:3128'
 ];
 
-#Luminati valid syntax
+# LIMINATI valid syntax
 $server = [
     'METHOD' => 'LUMINATI',
     'USERNAME' => 'lum-customer-hl_876f552a-zone-static',#lum-customer-CUSTOMER-zone-static
@@ -46,13 +46,13 @@ $server = [
     'SESSION' => mt_rand()
 ];
 
-#Apify valid syntax
+# APIFY valid syntax
 $server = [
     'METHOD' => 'APIFY',
     'PASSWORD' => 'my_ultra_secret_password'
 ];
 
-#IpVanish valid syntax
+# IPVANISH valid syntax
 $server = [
     'METHOD' => 'IPVANISH',
     'SERVER' => 'akl-c12.ipvanish.com',
