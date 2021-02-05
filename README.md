@@ -60,7 +60,7 @@ $server = [
 ];
 ```
 
-GET syntax with Custom Headers, Cookie Name, Proxy Server
+GET SYNTAX
 --------
 
 ```php
@@ -104,7 +104,7 @@ var_dump($test3->body);
 // string(51) "{...}"
 ```
 
-POST syntax with Custom Headers, Cookie Name, Proxy Server
+POST SYNTAX
 --------
 
 ```php
