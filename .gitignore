@@ -1,2 +1,6 @@
 .vscode/
 test.*
+
+CurlX_dev.php
+
+*.json

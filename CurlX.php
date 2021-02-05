@@ -1,65 +1,42 @@
 <?php
 /**
- * CurlX Lib - v0.0.3
+ * CurlX Lib - v0.0.4
  * @author devblack
  */
 class CurlX
 {
-    /**
-     * private access to response
-     * @var response
-     */
-    private static $response;
+    const VERSION = '0.0.4';
 
-    /**
-     * public access to info args of requests
-     * @var info
-     */
-    private static $info;
-
-    /**
-     * private and global var
-     * @var ch
-     */
-    private static $ch;
-
-    /**
-     * private cookie-file var
-     * @var cookie_file
-     */
-    private static $cookie_file=NULL;
-
-    /**
-     * requests error number, example: 5
-     * @var error_code
-     */
-    private static $error_code;
-
-    /**
-     * requests error string, example: Connection closed after connect.
-     * @var error_string
-     */
-    private static $error_string;
-
-    /**
-     * Default Options for request structure
-     */
-    private static $default = [
+    private static array $default = [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HEADER         => false,
+        CURLINFO_HEADER_OUT    => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_AUTOREFERER    => true,
         CURLOPT_CONNECTTIMEOUT => 60,
         CURLOPT_TIMEOUT        => 60,
         CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => 0,
-        CURLOPT_VERBOSE => 1
+        CURLOPT_SSL_VERIFYHOST => 0
     ];
+
+    private static $ch;
+
+    private static array $info;
+    private static $headersCallBack;
+
+    private static string $cookie_file = '';
+
+    private static int $error_code;
+    private static string $error_string;
+
+    private static $response;
+    
 
     /**
      * Basic curl_init for request structure
      * 
-     * @param url
+     * @access private
+     * @param string $url
      * 
      * @return void
      */
@@ -70,9 +47,10 @@ class CurlX
     }
 
     /**
-     * Set options to current curl structure
+     * Add options to current curl structure
      * 
-     * @param args
+     * @access public
+     * @param array $args
      * 
      * @return void
      */
@@ -82,8 +60,9 @@ class CurlX
     }
 
     /**
-     * Set a header to current curl structure
+     * Add an header to current curl structure
      * 
+     * @access private
      * @param header
      * 
      * @return void
@@ -94,10 +73,10 @@ class CurlX
     }
 
     /**
-     *  Set a proxy tunnel configuration to current curl structure
-     *  Support: HTTP/S, SOCKS4, SOCKS5
+     *  Set a proxy tunnel configuration to current curl structure, support: HTTP/S, SOCKS4, SOCKS5
      * 
-     * @param args
+     * @access private
+     * @param array $args
      * 
      * @return void
      */
@@ -110,9 +89,10 @@ class CurlX
     }
 
     /**
-     * Set configuration to proxy rotation in current curl structure
+     * Set configuration for Luminati in the current curl structure
      * 
-     * @param args
+     * @access private
+     * @param array $args
      * 
      * @return void
      */
@@ -125,9 +105,10 @@ class CurlX
     }
 
     /**
-     * Set configuration to proxy rotation in current curl structure
+     * Set configuration for Apify in current curl structure
      * 
-     * @param args
+     * @access private
+     * @param array $args
      * 
      * @return void
      */
@@ -140,9 +121,10 @@ class CurlX
     }
 
     /**
-     * Set configuration to proxy rotation in current curl structure
+     * Set configuration for Ipvanish in current curl structure
      * 
-     * @param args
+     * @access private
+     * @param array $args
      * 
      * @return void
      */
@@ -157,40 +139,33 @@ class CurlX
     /**
      * Detect the tunnel configuration
      * 
-     * @param args
+     * @access private
+     * @param array $args
      * 
      * @return void
      */
     private static function AutoRouter($args) : void 
     {
         switch (strtoupper($args['METHOD'])) {
-            case 'TUNNEL':
-                self::Tunnel($args);
-            break;
-            case 'LUMINATI':
-                self::Luminati($args);
-            break;
-            case 'APIFY':
-                self::Apify($args);
-            break;
-            case 'IPVANISH':
-                self::Ipvanish($args);
-            break;
+            case 'TUNNEL': self::Tunnel($args); break;
+            case 'LUMINATI': self::Luminati($args); break;
+            case 'APIFY': self::Apify($args); break;
+            case 'IPVANISH': self::Ipvanish($args); break;
         }
     }
 
     /**
-     * Created a file in the temp dir and import to current curl structure
+     * Created a file in the temporal DIRECTORY and import to current curl structure
      * 
-     * @param file
+     * @access private
+     * @param string $file
      * 
      * @return void
      */
     private static function SetCookie(string $file) : void 
     {
-        if (empty(self::$cookie_file)) {
-            self::$cookie_file = sprintf("%s/curlX_%s.txt", sys_get_temp_dir(), $file);
-        }
+        // PHP7.4+
+        self::$cookie_file ??= sprintf("%s/curlX_%s.txt", sys_get_temp_dir(), $file);
         
         self::SetOpt([
             CURLOPT_COOKIEJAR => self::$cookie_file,
@@ -200,6 +175,8 @@ class CurlX
 
     /**
      * Delete the current cookie file in curl structure
+     * 
+     * @access public
      * 
      * @return void
      */
@@ -211,9 +188,10 @@ class CurlX
     /**
      * Check parameters for curl structure
      * 
-     * @param headers
-     * @param cookie
-     * @param server
+     * @access private
+     * @param array $headers
+     * @param string $cookie
+     * @param array $server
      * 
      * @return void
      */
@@ -230,14 +208,15 @@ class CurlX
     }
 
     /**
-     * Send a GET request method with custom headers, cookies and server tunnel
+     * Send a GET request method with headers, cookies and server tunnel
      *
-     * @param url
-     * @param headers
-     * @param cookie
-     * @param server
+     * @access public
+     * @param string $url
+     * @param array $headers
+     * @param string $cookie
+     * @param array %server
      *
-     * @return response|error_string
+     * @return object
      */
     public static function Get(string $url, array $headers=NULL, string $cookie=NULL, array $server=NULL) : object
     {
@@ -250,13 +229,14 @@ class CurlX
     /**
      * Send a POST request method with custom post data, headers, cookies and server tunnel
      *
-     * @param url
-     * @param data
-     * @param headers
-     * @param cookie
-     * @param server
+     * @access public
+     * @param string $url
+     * @param string|array $data
+     * @param array $headers
+     * @param string $cookie
+     * @param array $server
      *
-     * @return response|error_string
+     * @return object
      */
     public static function Post(string $url, $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) : object
     {
@@ -273,14 +253,15 @@ class CurlX
     /**
      * Send a CUSTOM request method with data, headers, cookies and server tunnel
      *
-     * @param url
-     * @param method
-     * @param data
-     * @param headers
-     * @param cookie
-     * @param server
+     * @access public
+     * @param string $url
+     * @param string $method
+     * @param string|array $data
+     * @param array $headers
+     * @param string $cookie
+     * @param array $server
      *
-     * @return response|error_string
+     * @return void
      */
     public static function Custom(string $url, string $method='GET', $data=NULL, array $headers=NULL, string $cookie=NULL, array $server=NULL) : void 
     {
@@ -295,10 +276,16 @@ class CurlX
 
     /**
      * Send the request structure
-     * @return response|error_string
+     * 
+     * @access public
+     *
+     * @return object
      */
     public static function Run() : object
     {
+        self::MakeStdClass();
+        self::SetOpt([CURLOPT_HEADERFUNCTION => createHeaderCallback(self::$headersCallBack)]);
+
         self::$response = curl_exec(self::$ch);
         self::$info = curl_getinfo(self::$ch);
 
@@ -311,27 +298,37 @@ class CurlX
 
             return (object) [
                 'success' => false,
-                'code' => self::$info['http_code'],
-                'headers'  => self::$info,
-                'body'     => 'Request problem, use Debug() for more information.',
-                'errno'    => self::$error_code,
-                'error'    => self::$error_string
+                'code'    => self::$info['http_code'],
+                'headers' => [
+                    'request_headers'  => self::parseHeadersHandle(self::$info['request_header']),
+                    'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                ],
+                'errno' => self::$error_code,
+                'error' => self::$error_string,
+                'body'  => 'Error, ' . self::$error_string
             ];
         } else {
             curl_close(self::$ch);
 
             return (object) [
                 'success' => true,
-                'code' => self::$info['http_code'],
-                'headers'  => self::$info,
-                'body'     => self::$response
+                'code'    => self::$info['http_code'],
+                'headers' => [
+                    'request_headers'  => self::parseHeadersHandle(self::$info['request_header']),
+                    'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                ],
+                'body'    => self::$response
             ];
         }
     }
 
     /**
      * Show all data process|errors of the request
-     * @return information|errors
+     * 
+     * @access public
+     * @param bool $pretty
+     * 
+     * @return string
      */
     public static function Debug(bool $pretty=false) 
     {
@@ -339,26 +336,47 @@ class CurlX
             header('Content-Type: application/json');
             echo json_encode([
                 'curlx_debug' => [
-                    'information' => self::$info,
+                    'information' => [
+                        'request_headers'  => self::$info,
+                        'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                    ],
                     'errors' => [
-                        'errnum' => self::$error_code,
-                        'errstr' => self::$error_string
+                        'errnum' => self::$error_code ?? '',
+                        'errstr' => self::$error_string ?? ''
                     ],
                     'response' => self::$response
                 ]
             ]);
         } else {
             echo sprintf("=============================================<br/>\n<h2>CURLX DEBUG</h2>\n=============================================<br/>\n<h3>Response</h3>\n<code>%s</code><br/>\n\n", nl2br(htmlentities(self::$response)));
-            if (self::$error_string) {
+            echo sprintf("=============================================<br/>\n<h3>Information</h3><pre>%s</pre>", print_r(['request_headers' => self::$info, 'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)], true));
+            if (isset(self::$error_string)) {
                 echo sprintf("=============================================<br/>\n<h3>Errors</h3>\n<strong>Code: </strong>%d<br/>\n<strong>Message: </strong>%d<br/>\n", self::$error_code, self::$error_string);
             }
-            echo sprintf("=============================================<br/>\n<h3>Information</h3><pre>%s</pre>", print_r(self::$info, true));
         }
     }
 
     /**
+     * Create a placeholder to temporarily store the header callback data.
+     * 
+     * @access private
+     * 
+     * @return void
+     * 
+     */
+    private static function MakeStdClass() : void
+    {
+        $hcd = new \stdClass();
+        $hcd->rawResponseHeaders = '';
+        self::$headersCallBack = $hcd;
+    }
+
+    /**
      * Detect data type
-     * @param data
+     * 
+     * @access private
+     * @param string|array|object|null $data
+     * 
      * @return string
      */
     private static function DataType($data) 
@@ -374,19 +392,26 @@ class CurlX
 
     /**
      * Can split a string by two specify strings
-     * @param str
-     * @param start
-     * @param end
+     * 
+     * @access public
+     * @param string $str
+     * @param string $start
+     * @param string $end
+     * @param bool $decode
+     * 
      * @return string
      */
-    public static function ParseString(string $str, string $start, string $end) : string 
-    {
-        return explode($end, explode($start, $str)[1])[0];
+    public static function ParseString(string $str, string $start, string $end, bool $decode=false) : string 
+    {   
+        return $decode ? base64_decode(explode($end, explode($start, $str)[1])[0]) : explode($end, explode($start, $str)[1])[0];
     }
 
     /**
-     * Remove all spaces from any string
-     * @param str
+     * Remove all spaces from a string
+     * 
+     * @access public
+     * @param string $str
+     * 
      * @return string
      */
     public static function CleanString(string $str) : string 
@@ -396,17 +421,70 @@ class CurlX
 
     /**
     * Get a rand value from specify file.txt
-    * @param file
+    *
+    * @access public
+    * @param string $file
+    *
     * @return string
     */
     public static function GetRandVal(string $file) : string 
     {
         $_ = file($file);
-        return self::CleanString($_[rand(0, (count($_) - 1))]);
+        return $_[rand(0, (count($_) - 1))];
+    }
+
+    /**
+     * Parse Headers
+     *
+     * @access private
+     * @param string $raw
+     *
+     * @return array
+     */
+    private static function parseHeaders(string $raw) : array
+    {
+        //var_dump($raw);
+        $raw = preg_split('/\r\n/', $raw, null, PREG_SPLIT_NO_EMPTY);
+        $http_headers = [];
+        
+        for($i = 1; $i < count($raw); $i++) {
+            if (strpos($raw[$i], ':') !== false) {
+                list($key, $value) = explode(':', $raw[$i], 2);
+                $key = trim($key);
+                $value = trim($value);
+                isset($http_headers[$key]) ? $http_headers[$key] .= ',' . $value : $http_headers[$key] = $value;
+            }
+        }
+
+        return [$raw['0'] ??= $raw['0'], $http_headers];
+    }
+
+    /**
+     * Parse Headers Handle
+     *
+     * @access private
+     * @param string $raw
+     *
+     * @return array
+     */
+    private static function parseHeadersHandle(string $raw) : array
+    {
+        $request_headers = [];
+
+        list($scheme, $headers) = self::parseHeaders($raw);
+        $request_headers['scheme'] = $scheme;
+        foreach ($headers as $key => $value) {
+            $request_headers[$key] = $value;
+        }
+
+        return $request_headers;
     }
 
     /**
      * return a random user agent
+     * 
+     * @access private
+     *
      * @return string
      */
     private static function UserAgent() : string 
@@ -433,6 +511,16 @@ class CurlX
         ];
         return $uas[array_rand($uas)];
     }
+}
+
+/**
+ * Local createHeaderCallback 
+ */
+function createHeaderCallback($headersCallBack) {
+    return function ($_, $header) use ($headersCallBack) {
+        $headersCallBack->rawResponseHeaders .= $header;
+        return strlen($header);
+    };
 }
 
 /***
