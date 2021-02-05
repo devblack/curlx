@@ -1,7 +1,7 @@
 CurlX 0.0.4
 ================
 
-CurlX is a HTTP basic library written in PHP, for human beings and has no dependencies, working with PHP 7.3+.
+CurlX is a HTTP basic library written in PHP, for human beings and has no dependencies, working with PHP 7.4+.
 
 ![](https://i.imgur.com/AVwS6kZ.png)
 
