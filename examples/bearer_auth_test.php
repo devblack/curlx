@@ -3,7 +3,7 @@ require_once('../CurlX.php');
 
 $CurlX = new CurlX;
 /**
- * Custom request with DELETE METHOD
+ * Custom request with GET METHOD
  * @param url      : Require true
  * @param method   : Require true
  * @param data     : Require false
