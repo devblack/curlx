@@ -190,9 +190,9 @@ Other functions
 
 More?
 --------
-- More examples in [TESTING][] dir.
+- More examples in [examples][] dir.
 
-[TESTING]: https://github.com/devblack/curlx/tree/master/testing
+[examples]: https://github.com/devblack/curlx/tree/master/examples
 
 Features
 --------
