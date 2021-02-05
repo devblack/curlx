@@ -443,7 +443,6 @@ class CurlX
      */
     private static function parseHeaders(string $raw) : array
     {
-        //var_dump($raw);
         $raw = preg_split('/\r\n/', $raw, null, PREG_SPLIT_NO_EMPTY);
         $http_headers = [];
         
