@@ -31,7 +31,7 @@ HTTP TUNNEL SYNTAX
 --------
 
 ```php
-# PRROXY (http/s, socks4, socks5)
+# PROXY (http/s, socks4, socks5)
 $server = [
     'METHOD' => 'TUNNEL',
     'SERVER' => '47.254.145.99:3128'
