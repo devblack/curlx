@@ -17,13 +17,13 @@ GET, POST AND CUSTOM Syntax
 
 ```php
 # GET
-$CurlX::Get('https://api.myip.com/');
+$CurlX::Get("https://api.myip.com/");
 
 # POST
-$CurlX::Post('https://api.myip.com/', 'my_form_id=test&hello=mom');
+$CurlX::Post("https://api.myip.com/", "my_form_id=test&hello=mom");
 
 # CUSTOM
-$CurlX::Custom('https://api.myip.com/', 'HEAD');
+$CurlX::Custom("https://api.myip.com/", "HEAD");
 $CurlX::Run();
 ```
 
@@ -33,30 +33,30 @@ HTTP TUNNEL SYNTAX
 ```php
 # PROXY (http/s, socks4, socks5)
 $server = [
-    'METHOD' => 'TUNNEL',
-    'SERVER' => '47.254.145.99:3128'
+    "METHOD" => "TUNNEL",
+    "SERVER" => "47.254.145.99:3128"
 ];
 
-# LIMINATI valid syntax
+# LIMINATI valid syntax example
+$session => mt_rand();
 $server = [
-    'METHOD' => 'LUMINATI',
-    'USERNAME' => 'lum-customer-hl_876f552a-zone-static',#lum-customer-CUSTOMER-zone-static
-    'PASSWORD' => 'my_ultra_secret_password',
-    'COUNTRY' => 'RU',
-    'SESSION' => mt_rand()
+    "METHOD" => "CUSTOM",
+    "SERVER" = "http://zproxy.lum-superproxy.io:22225",
+    "AUTH" => "lum-customer-hl_876f552a-zone-static-route_err-pass_dyn-country-RU-session-$session:my_ultra_secret_password"
 ];
 
-# APIFY valid syntax
+# APIFY valid syntax example
 $server = [
-    'METHOD' => 'APIFY',
-    'PASSWORD' => 'my_ultra_secret_password'
+    "METHOD" => "CUSTOM",
+    "SERVER" = "http://proxy.apify.com:8000",
+    "AUTH" => "auto:my_ultra_secret_password"
 ];
 
-# IPVANISH valid syntax
+# IPVANISH valid syntax example
 $server = [
-    'METHOD' => 'IPVANISH',
-    'SERVER' => 'akl-c12.ipvanish.com',
-    'AUTH'   => 'my_zone_customer_id:my_zone_customer_password'
+    "METHOD" => "CUSTOM",
+    "SERVER" => "akl-c12.ipvanish.com:1080",
+    "AUTH"   => "my_zone_customer_id:my_zone_customer_password"
 ];
 ```
 
@@ -69,8 +69,8 @@ $test0 = $CurlX::Get("http://httpbin.org/get");
 
 #GET with Custom Headers
 $headers = array(
-    'Host: api.myip.com',
-    'my-custom-header: my-header-value'
+    "Host: api.myip.com",
+    "my-custom-header: my-header-value"
 );
 $test1 = $CurlX::Get("http://httpbin.org/get", $headers);
 
@@ -80,8 +80,8 @@ $test2 = $CurlX::Get("http://httpbin.org/get", $headers, $cookie);
 
 #GET with Headers, Cookie and Proxy Tunnel
 $server = [
-    'METHOD' => "TUNNEL",
-    'SERVER' => "47.254.145.99:3128"
+    "METHOD" => "TUNNEL",
+    "SERVER" => "47.254.145.99:3128"
 ];
 $test3 = $CurlX::Get("http://httpbin.org/get", $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only when you use the $cookie parameter.
@@ -96,7 +96,7 @@ var_dump($test3->code);
 // int(200)
 
 # Content type of the request
-var_dump($test3->headers['response_headers']['content-type']);
+var_dump($test3->headers["response_headers"]["content-type"]);
 // string(24) "text/html; charset=UTF-8"
 
 # Body response of the request
@@ -113,15 +113,15 @@ $test0 = $CurlX::Post("http://httpbin.org/post");
 
 #POST with Data-form and Custom Headers
 $headers = array(
-    'Host: httpbin.org',
-    'my-custom-header: my-header-value'
+    "Host: httpbin.org",
+    "my-custom-header: my-header-value"
 );
 $test1 = $CurlX::Post("http://httpbin.org/post", "test_ID=666&hello=mom", $headers);
 
 #POST with Json-Data and Custom Headers
 $data = array(
-    'hello' => "mom",
-    'key' => "value"
+    "hello" => "mom",
+    "key" => "value"
 );
 $test2 = $CurlX::Post("http://httpbin.org/post", $data, $headers);
 
@@ -131,8 +131,8 @@ $test3 = $CurlX::Post("http://httpbin.org/post", $data, $headers, $cookie);
 
 #POST with Json-Data, Custom Headers, Cookie and Proxy Tunnel
 $server = [
-    'METHOD' => "TUNNEL",
-    'SERVER' => "47.254.145.99:3128"
+    "METHOD" => "TUNNEL",
+    "SERVER" => "47.254.145.99:3128"
 ];
 $test4 = $CurlX::Post("http://httpbin.org/post", $data, $headers, $cookie, $server);
 #After all request was complete, you can delete the cookie file, Only when you use the $cookie parameter.
@@ -147,7 +147,7 @@ var_dump($test4->code);
 // int(200)
 
 # Content type of the request
-var_dump($test4->headers['response_headers']['content-type']);
+var_dump($test4->headers["response_headers"]["content-type"]);
 // string(24) "..."
 
 # Body response of the request
@@ -163,7 +163,7 @@ Other functions
     $CurlX::SetOpt([CURLOPT_HTTPAUTH => CURLAUTH_BEARER]);
 
     // Get a rand line from text file
-    $CurlX::GetRandVal('proxies.txt');
+    $CurlX::GetRandVal("proxies.txt");
     // Output: 202.137.25.8:8080
 
     // Parse a string by two specify strings
@@ -213,7 +213,7 @@ To install the source code:
 
 And include it in your scripts:
 
-    require_once 'CurlX.php';
+    require_once "CurlX.php";
     $CurlX = new CurlX;
 
 

@@ -25,6 +25,7 @@ class CurlX
     private static $headersCallBack;
 
     private static string $cookie_file = '';
+    private static string $ua = '';
 
     private static int $error_code;
     private static string $error_string;
@@ -89,49 +90,17 @@ class CurlX
     }
 
     /**
-     * Set configuration for Luminati in the current curl structure
+     * Proxy Auth
      * 
      * @access private
      * @param array $args
      * 
      * @return void
      */
-    private static function Luminati(array $args) : void 
+    private static function proxyAuth(array $args) : void 
     {
         self::SetOpt([
-            CURLOPT_PROXY => 'http://zproxy.lum-superproxy.io:22225',
-            CURLOPT_PROXYUSERPWD => "{$args['USERNAME']}-route_err-pass_dyn-country-{$args['COUNTRY']}-session-{$args['SESSION']}:{$args['PASSWORD']}"
-        ]);
-    }
-
-    /**
-     * Set configuration for Apify in current curl structure
-     * 
-     * @access private
-     * @param array $args
-     * 
-     * @return void
-     */
-    private static function Apify(array $args) : void 
-    {
-        self::SetOpt([
-            CURLOPT_PROXY => 'http://proxy.apify.com:8000',
-            CURLOPT_PROXYUSERPWD => "auto:{$args['PASSWORD']}"
-        ]);
-    }
-
-    /**
-     * Set configuration for Ipvanish in current curl structure
-     * 
-     * @access private
-     * @param array $args
-     * 
-     * @return void
-     */
-    private static function Ipvanish(array $args) : void 
-    {
-        self::SetOpt([
-            CURLOPT_PROXY => "{$args['SERVER']}:1080",
+            CURLOPT_PROXY => $args['SERVER'],
             CURLOPT_PROXYUSERPWD => $args['AUTH']
         ]);
     }
@@ -148,9 +117,7 @@ class CurlX
     {
         switch (strtoupper($args['METHOD'])) {
             case 'TUNNEL': self::Tunnel($args); break;
-            case 'LUMINATI': self::Luminati($args); break;
-            case 'APIFY': self::Apify($args); break;
-            case 'IPVANISH': self::Ipvanish($args); break;
+            case 'CUSTOM': self::proxyAuth($args); break;
         }
     }
 
@@ -337,8 +304,8 @@ class CurlX
             echo json_encode([
                 'curlx_debug' => [
                     'information' => [
-                        'request_headers'  => self::$info,
-                        'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                        'request_headers'  => self::parseArray(raw: self::$info),
+                        'response_headers' => self::parseHeadersHandle(raw: self::$headersCallBack->rawResponseHeaders)
                     ],
                     'errors' => [
                         'errnum' => self::$error_code ?? '',
@@ -349,7 +316,7 @@ class CurlX
             ]);
         } else {
             echo sprintf("=============================================<br/>\n<h2>CURLX DEBUG</h2>\n=============================================<br/>\n<h3>Response</h3>\n<code>%s</code><br/>\n\n", nl2br(htmlentities(self::$response)));
-            echo sprintf("=============================================<br/>\n<h3>Information</h3><pre>%s</pre>", print_r(['request_headers' => self::$info, 'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)], true));
+            echo sprintf("=============================================<br/>\n<h3>Information</h3><pre>%s</pre>", print_r(['request_headers' => self::parseArray(self::$info), 'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)], true));
             if (isset(self::$error_string)) {
                 echo sprintf("=============================================<br/>\n<h3>Errors</h3>\n<strong>Code: </strong>%d<br/>\n<strong>Message: </strong>%d<br/>\n", self::$error_code, self::$error_string);
             }
@@ -443,7 +410,7 @@ class CurlX
      */
     private static function parseHeaders(string $raw) : array
     {
-        $raw = preg_split('/\r\n/', $raw, null, PREG_SPLIT_NO_EMPTY);
+        $raw = preg_split('/\r\n/', $raw, -1, PREG_SPLIT_NO_EMPTY);
         $http_headers = [];
         
         for($i = 1; $i < count($raw); $i++) {
@@ -459,6 +426,25 @@ class CurlX
     }
 
     /**
+     *
+     * @access private
+     * @param array $raw
+     *
+     * @return array
+     */
+    private static function parseArray(array $raw) : array
+    {
+        if (array_key_exists('request_header', $raw)) {
+            list($scheme, $headers) = self::parseHeaders($raw['request_header']);
+            $nh['scheme'] = $scheme;
+            $nh += $headers;
+            $raw['request_header'] = $nh;
+        }
+
+        return $raw;
+    }
+
+    /**
      * Parse Headers Handle
      *
      * @access private
@@ -468,12 +454,14 @@ class CurlX
      */
     private static function parseHeadersHandle(string $raw) : array
     {
-        $request_headers = [];
 
         list($scheme, $headers) = self::parseHeaders($raw);
         $request_headers['scheme'] = $scheme;
+        
         foreach ($headers as $key => $value) {
-            $request_headers[$key] = $value;
+            if ($key != 'request_header') {
+                $request_headers[$key] = $value;
+            }
         }
 
         return $request_headers;
@@ -508,7 +496,13 @@ class CurlX
             "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Snapchat/10.77.5.59 (like Safari/604.1)",
             "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/80.0.3987.95 Mobile/15E148 Safari/604.1"
         ];
-        return $uas[array_rand($uas)];
+
+        if (empty(self::$ua)) {
+            self::$ua = $uas[array_rand($uas)];
+            return self::$ua;
+        } else {
+            return self::$ua;
+        }
     }
 }
 
