@@ -457,11 +457,10 @@ class CurlX
 
         list($scheme, $headers) = self::parseHeaders($raw);
         $request_headers['scheme'] = $scheme;
+        unset($headers['request_header']);
         
         foreach ($headers as $key => $value) {
-            if ($key != 'request_header') {
-                $request_headers[$key] = $value;
-            }
+            $request_headers[$key] = $value;
         }
 
         return $request_headers;
