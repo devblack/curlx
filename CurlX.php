@@ -304,8 +304,8 @@ class CurlX
             echo json_encode([
                 'curlx_debug' => [
                     'information' => [
-                        'request_headers'  => self::parseArray(raw: self::$info),
-                        'response_headers' => self::parseHeadersHandle(raw: self::$headersCallBack->rawResponseHeaders)
+                        'request_headers'  => self::parseArray(self::$info),
+                        'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
                     ],
                     'errors' => [
                         'errnum' => self::$error_code ?? '',
