@@ -135,7 +135,8 @@ class CurlX
         // set the current dir
         self::$current_dir = dirname(__FILE__);
         // PHP7.4+
-        self::$cookie_file ??= sprintf("%s/Cache/curlX_%s.txt", self::$current_dir, $file);
+        if(!is_dir(self::$current_dir.'/Cache/')) mkdir(self::$current_dir.'/Cache/', 0755);
+        self::$cookie_file = sprintf("%s/Cache/curlX_%s.txt", self::$current_dir, $file);
         // check if the dir is writable
         if (is_writable(self::$cookie_file)) {
             unlink(self::$cookie_file);
