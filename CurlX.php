@@ -13,8 +13,8 @@ class CurlX
         CURLINFO_HEADER_OUT    => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_AUTOREFERER    => true,
-        CURLOPT_CONNECTTIMEOUT => 60,
-        CURLOPT_TIMEOUT        => 60,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 10,
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_SSL_VERIFYHOST => 0
     ];
@@ -285,7 +285,7 @@ class CurlX
                 'success' => false,
                 'code'    => self::$info['http_code'],
                 'headers' => [
-                    'request_headers'  => self::parseHeadersHandle(self::$info['request_header']),
+                    'request_headers'  => key_exists('request_header', self::$info) ? self::parseHeadersHandle(self::$info['request_header']) : [],
                     'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
                 ],
                 'errno' => self::$error_code,
