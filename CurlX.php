@@ -286,7 +286,7 @@ class CurlX
                 'code'    => self::$info['http_code'],
                 'headers' => [
                     'request_headers'  => self::parseHeadersHandle(self::$info['request_header']),
-                    'response_headers' => null
+                    'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
                 ],
                 'errno' => self::$error_code,
                 'error' => self::$error_string,
