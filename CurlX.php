@@ -19,6 +19,8 @@ class CurlX
         CURLOPT_SSL_VERIFYHOST => 0
     ];
 
+    private static string $current_dir = '';
+
     private static $ch;
 
     private static array $info;
@@ -31,7 +33,6 @@ class CurlX
     private static string $error_string;
 
     private static $response;
-    
 
     /**
      * Basic curl_init for request structure
@@ -131,8 +132,17 @@ class CurlX
      */
     private static function SetCookie(string $file) : void 
     {
+        // set the current dir
+        self::$current_dir = dirname(__FILE__);
         // PHP7.4+
-        self::$cookie_file ??= sprintf("%s/curlX_%s.txt", sys_get_temp_dir(), $file);
+        self::$cookie_file ??= sprintf("%s/Cache/curlX_%s.txt", self::$current_dir, $file);
+        // check if the dir is writable
+        if (is_writable(self::$cookie_file)) {
+            unlink(self::$cookie_file);
+        } else {
+            trigger_error("The current directory is not writable, please add permissions 0755 to Cache dir and 0644 to CurlX.php", E_USER_ERROR);
+            return;
+        }
         
         self::SetOpt([
             CURLOPT_COOKIEJAR => self::$cookie_file,
@@ -149,7 +159,15 @@ class CurlX
      */
     public static function DeleteCookie() : void 
     {
-        unlink(self::$cookie_file);
+        if (empty(self::$current_dir))
+            trigger_error("Cookie function (SetCookie) was not called!", E_USER_WARNING);
+            return;
+
+        if (file_exists(self::$cookie_file)) {
+            unlink(self::$cookie_file);
+        } else {
+            trigger_error(sprintf("The filename: %s not exits in %s.", self::$cookie_file, self::$current_dir), E_USER_WARNING);
+        }
     }
 
     /**
@@ -268,7 +286,7 @@ class CurlX
                 'code'    => self::$info['http_code'],
                 'headers' => [
                     'request_headers'  => self::parseHeadersHandle(self::$info['request_header']),
-                    'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                    'response_headers' => null
                 ],
                 'errno' => self::$error_code,
                 'error' => self::$error_string,
@@ -394,10 +412,10 @@ class CurlX
     *
     * @return string
     */
-    public static function GetRandVal(string $file) : string 
+    public static function GetRandVal(string $file) : string
     {
-        $_ = file($file);
-        return $_[rand(0, (count($_) - 1))];
+        $_ = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        return $_[array_rand($_)];
     }
 
     /**
@@ -452,8 +470,10 @@ class CurlX
      *
      * @return array
      */
-    private static function parseHeadersHandle(string $raw) : array
+    private static function parseHeadersHandle($raw) : array
     {
+        if (empty($raw))
+            return [];
 
         list($scheme, $headers) = self::parseHeaders($raw);
         $request_headers['scheme'] = $scheme;
