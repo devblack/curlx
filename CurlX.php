@@ -13,8 +13,8 @@ class CurlX
         CURLINFO_HEADER_OUT    => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_AUTOREFERER    => true,
-        CURLOPT_CONNECTTIMEOUT => 10,
-        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_CONNECTTIMEOUT => 30,
+        CURLOPT_TIMEOUT        => 60,
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_SSL_VERIFYHOST => 0
     ];
