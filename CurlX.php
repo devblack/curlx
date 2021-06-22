@@ -134,13 +134,12 @@ class CurlX
     {
         // set the current dir
         self::$current_dir = dirname(__FILE__);
-        // PHP7.4+
+        # check if the dir exits, if not create it
         if(!is_dir(self::$current_dir.'/Cache/')) mkdir(self::$current_dir.'/Cache/', 0755);
+        // PHP7.4+
         self::$cookie_file = sprintf("%s/Cache/curlX_%s.txt", self::$current_dir, $file);
         // check if the dir is writable
-        if (is_writable(self::$cookie_file)) {
-            unlink(self::$cookie_file);
-        } else {
+        if (!is_writable(self::$current_dir)) {
             trigger_error("The current directory is not writable, please add permissions 0755 to Cache dir and 0644 to CurlX.php", E_USER_ERROR);
             return;
         }
@@ -164,7 +163,8 @@ class CurlX
             trigger_error("Cookie function (SetCookie) was not called!", E_USER_WARNING);
             return;
 
-        if (file_exists(self::$cookie_file)) {
+        if (is_file(self::$cookie_file)) {
+            chmod(self::$cookie_file, 0644);
             unlink(self::$cookie_file);
         } else {
             trigger_error(sprintf("The filename: %s not exits in %s.", self::$cookie_file, self::$current_dir), E_USER_WARNING);
