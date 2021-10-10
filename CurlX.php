@@ -183,13 +183,13 @@ class CurlX
      */
     private static function CheckParam(array $headers=NULL, string $cookie=NULL, array $server=NULL) : void 
     {
-        if (!empty($headers) && is_array($headers))
+        if (!empty($headers) && (is_array($headers) || is_object($headers)))
             self::Header($headers);
 
         if (!empty($cookie))
             self::SetCookie($cookie);
 
-        if (!empty($server) && is_array($server))
+        if (!empty($server) && (is_array($server) || is_object($server)))
             self::AutoRouter($server);
     }
 
@@ -285,9 +285,9 @@ class CurlX
             return (object) [
                 'success' => false,
                 'code'    => self::$info['http_code'],
-                'headers' => [
-                    'request_headers'  => key_exists('request_header', self::$info) ? self::parseHeadersHandle(self::$info['request_header']) : [],
-                    'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                'headers' => (object) [
+                    'request'  => key_exists('request_header', self::$info) ? self::parseHeadersHandle(self::$info['request_header']) : [],
+                    'response' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
                 ],
                 'errno' => self::$error_code,
                 'error' => self::$error_string,
@@ -299,9 +299,9 @@ class CurlX
             return (object) [
                 'success' => true,
                 'code'    => self::$info['http_code'],
-                'headers' => [
-                    'request_headers'  => self::parseHeadersHandle(self::$info['request_header']),
-                    'response_headers' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
+                'headers' => (object) [
+                    'request'  => self::parseHeadersHandle(self::$info['request_header']),
+                    'response' => self::parseHeadersHandle(self::$headersCallBack->rawResponseHeaders)
                 ],
                 'body'    => self::$response
             ];
