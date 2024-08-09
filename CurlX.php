@@ -106,7 +106,7 @@ class CurlX extends Helper
     private stdClass $callback;
 
     private string $cookieFile = '';
-    private string $userAgent = 'CurlX v1.0.0b (Created by @d3vbl4ck)';
+    private string $userAgent = 'CurlX v2.0.0b (Created by @d3vbl4ck)';
 
     private int $error_code;
     private string $error_string;
