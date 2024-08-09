@@ -313,10 +313,6 @@ class CurlX extends Helper
         unset($this->ch);
     }
 
-    private function handler() {
-
-    }
-
     public function run() : object
     {
         $this->makeStdClass();
