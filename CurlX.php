@@ -171,7 +171,7 @@ class CurlX extends Helper
      * @return void
      * @throws CurlException
      */
-    private function setCookie(string $file) : void
+    private function setCookie(CookieJarInterface|string $file_name) : void
     {
         // set the current dir
         $this->cacheDir = dirname(__FILE__);
@@ -180,6 +180,13 @@ class CurlX extends Helper
         if (!is_dir($this->cacheDir . '/Cache/')) {
             mkdir($this->cacheDir . '/Cache/', 0755);
         }
+
+        if($file_name instanceof CookieJarInterface) 
+            $file = $file_name->getFileName();
+        
+            $file_name
+                ->setFileName($this->cacheDir . '/Cache/curlX_' . $file . '.txt')
+                ->save();
 
         // PHP7.4+
         $this->cookieFile = sprintf("%s/Cache/curlX_%s.txt", $this->cacheDir, $file);
@@ -232,7 +239,7 @@ class CurlX extends Helper
      * @return void
      * @throws CurlException
      */
-    private function checkParams(?array $headers = null, ?string $cookie = null, ?array $server = null): void
+    private function checkParams(?array $headers = null, string|CookieJarInterface $cookie = null, ?array $server = null): void
     {
         if (is_array($headers)) {
             $this->setHeader($headers);
@@ -255,7 +262,7 @@ class CurlX extends Helper
      * @return object
      * @throws Exception
      */
-    public function get(string $url, ?array $headers=null, ?string $cookie=null, ?array $server=null): object
+    public function get(string $url, ?array $headers=null, string|CookieJarInterface $cookie=null, ?array $server=null): object
     {
         $this->prepareHandle($url);
 
@@ -273,7 +280,7 @@ class CurlX extends Helper
      * @return object
      * @throws Exception
      */
-    public function post(string $url, string|array|null $data=null, ?array $headers=null, ?string $cookie=null, ?array $server=null) : object
+    public function post(string $url, string|array|null $data=null, ?array $headers=null, string|CookieJarInterface $cookie=null, ?array $server=null) : object
     {
         $this->prepareHandle($url);
 
@@ -296,7 +303,7 @@ class CurlX extends Helper
      * @return void
      * @throws CurlException
      */
-    public function custom(string $url, string $method='GET', string|array|null $data=null, ?array $headers=null, ?string $cookie=null, ?array $server=null) : void
+    public function custom(string $url, string $method='GET', string|array|null $data=null, ?array $headers=null, string|CookieJarInterface $cookie=null, ?array $server=null) : void
     {
         $this->prepareHandle($url);
 
