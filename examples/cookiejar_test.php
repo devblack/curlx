@@ -1,5 +1,12 @@
 <?php
-require_once('../CurlX.php');
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Thevenrex\Curlx\CurlX;
+use Thevenrex\Curlx\Exceptions\CurlException;
+use Thevenrex\Curlx\CookieJar\{
+    Cookie,
+    CookieJar
+};
 
 $CurlX = new CurlX();
 
