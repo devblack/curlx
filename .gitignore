@@ -5,3 +5,4 @@ test.*
 CurlX_dev.bak
 
 *.json
+/vendor/
