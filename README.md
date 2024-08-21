@@ -198,22 +198,21 @@ Installation
 To install the source code:
 
     $ git clone https://github.com/devblack/curlx.git
+    $ cd curlx
+    $ composer install
 
 And include it in your scripts:
 
-    require_once "CurlX.php";
+    require_once __DIR__ . '/vendor/autoload.php';
+
+    use Thevenrex\Curlx\CurlX;
     $CurlX = new CurlX();
 
 
-### Install source from zip/tarball
-Alternatively, you can fetch a [tarball][] or [zipball][]:
+### Install with composer
+Install library with composer package manager [php]
 
-    $ curl -L https://github.com/devblack/curlx/tarball/master | tar xzv
-    (or)
-    $ wget https://github.com/devblack/curlx/tarball/master -O - | tar xzv
-
-[tarball]: https://github.com/devblack/curlx/tarball/master
-[zipball]: https://github.com/devblack/curlx/zipball/master
+    $ composer require thevenrexoff/curlx
 
 
 Contribute
