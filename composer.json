@@ -1,0 +1,19 @@
+{
+    "name": "thevenrex/curlx",
+    "description": "HTTP basic library written in PHP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Thevenrex\\Curlx\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ThevenRex",
+            "email": "thevenrexoficial@outlook.es"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
