@@ -172,34 +172,32 @@ class CurlX extends Helper
      * @throws CurlException
      */
     private function setCookie(CookieJarInterface|string $file_name) : void
-    {
-        // set the current dir
-        $this->cacheDir = dirname(__FILE__);
+{
+    $this->cacheDir = dirname(__FILE__);
 
-        # check if the dir exits, if not create it
-        if (!is_dir($this->cacheDir . '/Cache/')) {
-            mkdir($this->cacheDir . '/Cache/', 0755);
-        }
-
-        if($file_name instanceof CookieJarInterface) 
-            $file = $file_name->getFileName();
-        
-            $file_name
-                ->setFileName($this->cacheDir . '/Cache/curlX_' . $file . '.txt')
-                ->save();
-
-        // PHP7.4+
-        $this->cookieFile = sprintf("%s/Cache/curlX_%s.txt", $this->cacheDir, $file);
-        // check if the dir is writable
-        if (!is_writable($this->cacheDir)) {
-            throw new CurlException('The current directory is not writable, please add permissions 0755 to Cache dir and 0644 to CurlX.php');
-        }
-
-        $this->setOpt([
-            CURLOPT_COOKIEJAR => $this->cookieFile,
-            CURLOPT_COOKIEFILE => $this->cookieFile
-        ]);
+    if (!is_dir($this->cacheDir . '/Cache/')) {
+        mkdir($this->cacheDir . '/Cache/', 0755);
     }
+
+    if ($file_name instanceof CookieJarInterface) {
+        $file = $file_name->getFileName();
+        $file_name
+            ->setFileName($this->cacheDir . '/Cache/curlX_' . $file . '.txt')
+            ->save();
+    } else {
+        $file = $file_name;
+    }
+
+    $this->cookieFile = sprintf("%s/Cache/curlX_%s.txt", $this->cacheDir, $file);
+    if (!is_writable($this->cacheDir)) {
+        throw new CurlException('The current directory is not writable, please add permissions 0755 to Cache dir and 0644 to CurlX.php');
+    }
+
+    $this->setOpt([
+        CURLOPT_COOKIEJAR => $this->cookieFile,
+        CURLOPT_COOKIEFILE => $this->cookieFile
+    ]);
+}
 
     /**
      * @return void
