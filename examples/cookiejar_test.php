@@ -22,9 +22,9 @@ try {
         headers: ['my-custom-header: set-my-cookies'],
         cookie: $cookie
     );
-    // $CurlX->deleteCookie();
+    $CurlX->deleteCookie();
     $CurlX->debug();
-    // echo $response->getBody();
+    // echo $response->body;
 
 } catch (CurlException $e) {
     echo $e->getMessage();

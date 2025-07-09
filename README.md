@@ -1,4 +1,4 @@
-CurlX v2.0.0b
+CurlX v2.0.1b
 ================
 
 CurlX is an HTTP basic library written in PHP for human beings and has no dependencies, working with PHP 8.2+.
@@ -104,7 +104,7 @@ var_dump($test3->getHeaders()["response"]["content-type"]);
 // string(24) "text/html; charset=UTF-8"
 
 # Body response of the request
-var_dump($test3->getBody());
+var_dump($test3->body);
 // string(51) "{...}"
 ```
 
@@ -155,7 +155,7 @@ var_dump($test4->getHeaders()["response"]["content-type"]);
 // string(24) "..."
 
 # Body response of the request
-var_dump($test4->getBody());
+var_dump($test4->body);
 // string(51) "{...}"
 ```
 

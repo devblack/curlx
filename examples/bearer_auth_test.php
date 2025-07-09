@@ -7,9 +7,9 @@ $CurlX = new CurlX();
 try {
     $CurlX->custom(
         url: 'https://luminati.io/api/count_available_ips?customer=CUSTOMER&zone=ZONE',
-        method: 'GET', // your request method
         data: NULL, // your data
-        headers: ['Authorization: Bearer API_TOKEN']
+        headers: ['Authorization: Bearer API_TOKEN'], // headers
+        method: 'GET' // your request method. GET by default
     );
 
     /**
@@ -23,8 +23,8 @@ try {
     // send the Custom request and catch in $resp
     $response = $CurlX->run();
     // Print the object data or if you are working is develop mode, you can use Debug()
-    // To print the body response: $resp->getBody;
-    var_dump($response->getBody());
+    // To print the body response: $resp->body;
+    var_dump($response->body);
 } catch (CurlException $e) {
     echo $e->getMessage();
 }

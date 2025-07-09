@@ -5,7 +5,7 @@ require_once('../CurlX.php');
 $CurlX = new CurlX();
 
 // generate a new unique id for file name
-$cookie = uniqid();
+$cookie = new CookieJar();
 
 // Send GET request and catch it in $resp
 try {
@@ -25,7 +25,7 @@ try {
     // To print the body response: $resp->body;
     $CurlX->deleteCookie();
     //$CurlX->debug();
-    var_dump($response->getBody());
+    var_dump($response->body);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

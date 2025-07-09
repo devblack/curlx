@@ -14,16 +14,16 @@ $server = [
 try {
     $CurlX->custom(
         url: 'https://host/users/666',
-        method: 'PUT',
         data: 'params[name]=James',
         headers: ['custom-header: my-custom-value', 'foo: bar'],
-        server: $server
+        server: $server,
+        method: 'PUT'
     );
     // send the Custom request and catch in $resp
     $resp = $CurlX->run();
     // Print the object data or if you are working is develop mode, you can use Debug()
-    // To print the body response: $resp->getBody;
-    print_r($resp->getBody());
+    // To print the body response: $resp->body;
+    print_r($resp->body);
 
 } catch (CurlException $e) {
     echo $e->getMessage();

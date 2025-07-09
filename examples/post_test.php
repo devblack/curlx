@@ -17,7 +17,7 @@ try {
         cookie: $cookie
     );
     $CurlX->deleteCookie();
-    var_dump($response->getBody());
+    var_dump($response->body);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

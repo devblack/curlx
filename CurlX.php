@@ -57,8 +57,16 @@ class Response {
         private readonly bool  $success = false,
         private readonly int   $status_code = 200,
         private readonly array $headers = [],
-        private                $body = null,
-        private                $reason = null
+        public                 $body = null {
+            get {
+                return $this->body;
+            }
+        },
+        private                $reason = null {
+            get {
+                return $this->reason;
+            }
+        }
     ) {}
 
     public function isSuccess(): int
@@ -75,13 +83,6 @@ class Response {
         return $this->headers;
     }
 
-    public function getBody(): ?string {
-        return $this->body;
-    }
-
-    public function getReason(): ?string {
-        return $this->reason;
-    }
 }
 
 class CurlX extends Helper
@@ -106,7 +107,7 @@ class CurlX extends Helper
     private stdClass $callback;
 
     private string $cookieFile = '';
-    private string $userAgent = 'CurlX v2.0.0b (Created by @d3vbl4ck)';
+    private string $userAgent = 'CurlX v2.0.1b (Created by @d3vbl4ck)';
 
     private int $error_code;
     private string $error_string;
@@ -167,37 +168,46 @@ class CurlX extends Helper
     }
 
     /**
-     * @param string $file
+     * @param CookieJarInterface|string $file_name
      * @return void
      * @throws CurlException
      */
-    private function setCookie(CookieJarInterface|string $file_name) : void
-{
-    $this->cacheDir = dirname(__FILE__);
+    private function setCookie(CookieJarInterface|string $file_name): void
+    {
+        $this->cacheDir = __DIR__;
+        $cachePath = $this->cacheDir . '/Cache/';
 
-    if (!is_dir($this->cacheDir . '/Cache/')) {
-        mkdir($this->cacheDir . '/Cache/', 0755);
+        if (!is_dir($cachePath)) {
+            if (!mkdir($cachePath, 0755, true) && !is_dir($cachePath)) {
+                throw new CurlException("Failed to create cache directory: $cachePath");
+            }
+        }
+
+        $base = $file_name instanceof CookieJarInterface
+            ? basename($file_name->getFileName(), '.txt')
+            : basename($file_name, '.txt');
+
+        $base = preg_replace('/^(curlX_)+/', '', $base);
+        $fullPath = $cachePath . "curlX_$base.txt";
+
+        if (!file_exists($fullPath)) {
+            if (false === @touch($fullPath)) {
+                throw new CurlException("Failed to create cookie file: $fullPath");
+            }
+            chmod($fullPath, 0644);
+
+            if ($file_name instanceof CookieJarInterface) {
+                $file_name->setFileName($fullPath)->save();
+            }
+        }
+
+        $this->cookieFile = $fullPath;
+
+        $this->setOpt([
+            CURLOPT_COOKIEJAR => $this->cookieFile,
+            CURLOPT_COOKIEFILE => $this->cookieFile,
+        ]);
     }
-
-    if ($file_name instanceof CookieJarInterface) {
-        $file = $file_name->getFileName();
-        $file_name
-            ->setFileName($this->cacheDir . '/Cache/curlX_' . $file . '.txt')
-            ->save();
-    } else {
-        $file = $file_name;
-    }
-
-    $this->cookieFile = sprintf("%s/Cache/curlX_%s.txt", $this->cacheDir, $file);
-    if (!is_writable($this->cacheDir)) {
-        throw new CurlException('The current directory is not writable, please add permissions 0755 to Cache dir and 0644 to CurlX.php');
-    }
-
-    $this->setOpt([
-        CURLOPT_COOKIEJAR => $this->cookieFile,
-        CURLOPT_COOKIEFILE => $this->cookieFile
-    ]);
-}
 
     /**
      * @return void
@@ -232,12 +242,12 @@ class CurlX extends Helper
 
     /**
      * @param array|null $headers
-     * @param string|null $cookie
+     * @param string|CookieJarInterface|null $cookie
      * @param array|null $server
      * @return void
      * @throws CurlException
      */
-    private function checkParams(?array $headers = null, string|CookieJarInterface $cookie = null, ?array $server = null): void
+    private function checkParams(?array $headers, string|CookieJarInterface|null $cookie, ?array $server): void
     {
         if (is_array($headers)) {
             $this->setHeader($headers);
@@ -255,12 +265,12 @@ class CurlX extends Helper
     /**
      * @param string $url
      * @param array|null $headers
-     * @param string|null $cookie
+     * @param string|CookieJarInterface|null $cookie
      * @param array|null $server
      * @return object
-     * @throws Exception
+     * @throws CurlException
      */
-    public function get(string $url, ?array $headers=null, string|CookieJarInterface $cookie=null, ?array $server=null): object
+    public function get(string $url, ?array $headers = null, string|CookieJarInterface|null $cookie = null, ?array $server = null): object
     {
         $this->prepareHandle($url);
 
@@ -273,12 +283,12 @@ class CurlX extends Helper
      * @param string $url
      * @param string|array|null $data
      * @param array|null $headers
-     * @param string|null $cookie
+     * @param string|CookieJarInterface|null $cookie
      * @param array|null $server
      * @return object
-     * @throws Exception
+     * @throws CurlException
      */
-    public function post(string $url, string|array|null $data=null, ?array $headers=null, string|CookieJarInterface $cookie=null, ?array $server=null) : object
+    public function post(string $url, string|array|null $data, ?array $headers = null, string|CookieJarInterface|null $cookie = null, ?array $server = null) : object
     {
         $this->prepareHandle($url);
 
@@ -293,15 +303,15 @@ class CurlX extends Helper
 
     /**
      * @param string $url
-     * @param string $method
      * @param string|array|null $data
      * @param array|null $headers
-     * @param string|null $cookie
+     * @param string|CookieJarInterface|null $cookie
      * @param array|null $server
+     * @param string $method
      * @return void
      * @throws CurlException
      */
-    public function custom(string $url, string $method='GET', string|array|null $data=null, ?array $headers=null, string|CookieJarInterface $cookie=null, ?array $server=null) : void
+    public function custom(string $url, string|array|null $data, ?array $headers, string|CookieJarInterface|null $cookie = null, ?array $server = null, string $method='GET') : void
     {
         $this->prepareHandle($url);
 
@@ -359,7 +369,7 @@ class CurlX extends Helper
 
     public function debug(): void
     {
-        # check if is cli client
+        # check if is a cli client
         if (php_sapi_name() === 'cli') {
             echo "=============================================\nCURLX DEBUG\n=============================================\n";
             echo "Response:\n" . $this->body . "\n\n";
@@ -379,7 +389,7 @@ class CurlX extends Helper
         } else {
             header('Content-Type: application/json');
             echo json_encode([
-                'curlx_debug' => [
+                'curlX_debug' => [
                     'information' => [
                         'request_headers'  => $this->parseArray($this->info),
                         'response_headers' => $this->parseHeadersHandle($this->callback->rawResponseHeaders)
@@ -419,18 +429,18 @@ class CookieJar implements CookieJarInterface {
 
     protected string $banner = "# Netscape HTTP Cookie File\n# https://curl.se/docs/http-cookies.html\n# This file was generated by libcurl! Edit at your own risk.\n\n";
 
-    private $cookies = [];
-
-    protected $path;
+    private array $cookies = [];
 
     public function __construct(
         public string $filename = '',
     ) {
-        $this->filename = uniqid();
+        if (empty($this->filename)) {
+            $this->filename = uniqid();
+        }
     }
 
-    public function setFileName(string $filename) {
-        $this->filename = $filename;
+    public function setFileName(string $filename): self {
+        $this->filename = realpath(dirname($filename)) . DIRECTORY_SEPARATOR . basename($filename);
         return $this;
     }
 
@@ -438,12 +448,14 @@ class CookieJar implements CookieJarInterface {
         return $this->filename;
     }
 
-    public function add(Cookie $cookie) {
+    public function add(Cookie $cookie): static
+    {
         $this->cookies[] = $cookie;
         return $this;
     }
 
-    public function parseCookies() {
+    public function parseCookies(): string
+    {
         $all_cookies = $this->banner;
 
         foreach($this->cookies as $cookie) {
@@ -453,14 +465,16 @@ class CookieJar implements CookieJarInterface {
         return trim($all_cookies);
     }
 
-    public function save() {
+    public function save(): void
+    {
         file_put_contents(
             $this->filename,
             $this->parseCookies()
         );
     }
 
-    public function delete() {
+    public function delete(): void
+    {
         if(file_exists($this->filename)) {
             unlink($this->filename);
         }
@@ -469,7 +483,7 @@ class CookieJar implements CookieJarInterface {
 
 class Cookie {
 
-    public const HTTP_ONLY = '#HttpOnly_.';
+    private string $HTTP_ONLY = '#HttpOnly_.';
 
     public function __construct(
         public string $domain = '',
@@ -480,12 +494,13 @@ class Cookie {
         public string $name = '',
         public string $value = '',
     ) {
-   
+
     }
 
-    public function get() {
+    public function get(): string
+    {
         $cookie = [
-            'domain' => $this->httpOnly == 'TRUE' ? self::HTTP_ONLY . $this->domain : $this->domain,
+            'domain' => $this->httpOnly == 'TRUE' ? $this->HTTP_ONLY . $this->domain : $this->domain,
             'includeSubDomains' => $this->includeSubDomains,
             'path' => $this->path,
             'httpOnly' => $this->httpOnly,
