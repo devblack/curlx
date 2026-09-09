@@ -157,6 +157,10 @@ Other functions
     // Set a custom option to current CURL structure
     $CurlX->setOpt([CURLOPT_HTTPAUTH => CURLAUTH_BEARER]);
 
+    // Cookie files are stored in Cache/ inside the library dir.
+    // For read-only installs (e.g. vendor/), point the cache elsewhere:
+    $CurlX = new CurlX(['cache_dir' => sys_get_temp_dir() . '/curlx']);
+
     /**
      * Show all data process|errors of the request
      * 

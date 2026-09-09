@@ -106,6 +106,10 @@ class CurlX extends Helper
     private bool|string $body;
 
     public function __construct(array $config = []) {
+        if (isset($config['cache_dir'])) {
+            $this->cacheDir = $config['cache_dir'];
+            unset($config['cache_dir']);
+        }
         $this->default =  array_replace($this->default, $config);
     }
 
@@ -165,7 +169,7 @@ class CurlX extends Helper
      */
     private function setCookie(CookieJarInterface|string $file_name): void
     {
-        $this->cacheDir = __DIR__;
+        $this->cacheDir = $this->cacheDir ?: __DIR__;
         $cachePath = $this->cacheDir . '/Cache/';
 
         if (!is_dir($cachePath)) {
@@ -186,10 +190,10 @@ class CurlX extends Helper
                 throw new CurlException("Failed to create cookie file: $fullPath");
             }
             chmod($fullPath, 0600);
+        }
 
-            if ($file_name instanceof CookieJarInterface) {
-                $file_name->setFileName($fullPath)->save();
-            }
+        if ($file_name instanceof CookieJarInterface) {
+            $file_name->setFileName($fullPath)->save();
         }
 
         $this->cookieFile = $fullPath;

@@ -23,5 +23,11 @@ if ($path === '/echo') {
     return;
 }
 
+if ($path === '/cookie') {
+    header('Content-Type: text/plain');
+    echo $_SERVER['HTTP_COOKIE'] ?? '';
+    return;
+}
+
 http_response_code(404);
 echo 'not found';

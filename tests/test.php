@@ -87,6 +87,25 @@ $x2->get("$base/empty", cookie: $jar2);
 $x2->deleteCookie();
 check(true, 'CookieJar round-trip through setCookie/deleteCookie');
 
+// cookies added to an already-created jar file are still sent on reuse
+$pre = new CookieJar();
+$pre->add(new Cookie('127.0.0.1', 'TRUE', '/', 'FALSE', (string) (time() + 3600), 'pre', 'seed'));
+$x3 = new CurlX();
+$x3->get("$base/empty", cookie: $pre); // creates the jar file
+$pre->add(new Cookie('127.0.0.1', 'TRUE', '/', 'FALSE', (string) (time() + 3600), 'pre2', 'seed2'));
+$body = $x3->get("$base/cookie", cookie: $pre)->body; // file exists; jar gains a new cookie
+check(str_contains($body, 'pre=seed') && str_contains($body, 'pre2=seed2'), 'reused jar sends newly added cookies');
+$x3->deleteCookie();
+
+// configurable cache dir
+$tmpDir = sys_get_temp_dir() . "\\curlx_cache_" . uniqid();
+$x4 = new CurlX(['cache_dir' => $tmpDir]);
+$x4->get("$base/empty", cookie: 'sess1');
+$x4->deleteCookie();
+check(glob("$tmpDir/Cache/*.txt") === [] || glob("$tmpDir/Cache/*.txt") === false, 'cache_dir option is honored');
+@rmdir("$tmpDir/Cache");
+@rmdir($tmpDir);
+
 if ($fails > 0) {
     fwrite(STDERR, "$fails CHECK(S) FAILED\n");
     exit(1);
