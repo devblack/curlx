@@ -155,7 +155,7 @@ class CurlX extends Helper
     {
         $args = array_change_key_case($args);
 
-        match($args['method']) {
+        match(strtolower($args['method'])) {
             'tunnel' => $this->tunnel($args),
             'custom' => $this->proxyAuth($args),
             default => throw new CurlException('Invalid proxy router.')
@@ -193,7 +193,11 @@ class CurlX extends Helper
         }
 
         if ($file_name instanceof CookieJarInterface) {
-            $file_name->setFileName($fullPath)->save();
+            $file_name->setFileName($fullPath);
+            if ($file_name->hasCookies() || !file_exists($fullPath)) {
+                $existing = file_exists($fullPath) ? (string) file_get_contents($fullPath) : '';
+                $file_name->save($existing);
+            }
         }
 
         $this->cookieFile = $fullPath;
@@ -446,6 +450,11 @@ class CookieJar implements CookieJarInterface {
         return $this;
     }
 
+    public function hasCookies(): bool
+    {
+        return count($this->cookies) > 0;
+    }
+
     public function parseCookies(): string
     {
         $all_cookies = $this->banner;
@@ -457,12 +466,28 @@ class CookieJar implements CookieJarInterface {
         return trim($all_cookies);
     }
 
-    public function save(): void
+    /**
+     * @param string $existing raw content of an existing cookie file to keep
+     *                         (cookies already harvested by libcurl; jar seed
+     *                         lines are appended last so they win on clashes)
+     */
+    public function save(string $existing = ''): void
     {
-        file_put_contents(
-            $this->filename,
-            $this->parseCookies()
-        );
+        $contents = $this->banner;
+
+        foreach (preg_split('/\r?\n/', $existing) as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue;
+            }
+            $contents .= $line . "\n";
+        }
+
+        foreach ($this->cookies as $cookie) {
+            $contents .= $cookie->get() . "\n";
+        }
+
+        file_put_contents($this->filename, trim($contents));
     }
 
     public function delete(): void

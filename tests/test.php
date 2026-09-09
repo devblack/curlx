@@ -97,6 +97,21 @@ $body = $x3->get("$base/cookie", cookie: $pre)->body; // file exists; jar gains 
 check(str_contains($body, 'pre=seed') && str_contains($body, 'pre2=seed2'), 'reused jar sends newly added cookies');
 $x3->deleteCookie();
 
+// a reused jar must not wipe cookies libcurl already harvested from a server
+$sess = new CookieJar();
+$x5 = new CurlX();
+$x5->get("$base/set", cookie: $sess); // server sets harvested=value; libcurl persists it to the jar file
+$sess->add(new Cookie('127.0.0.1', 'TRUE', '/', 'FALSE', (string) (time() + 3600), 'mine', 'x'));
+$body = $x5->get("$base/cookie", cookie: $sess)->body;
+check(str_contains($body, 'harvested=value') && str_contains($body, 'mine=x'), 'harvested cookies survive jar reuse');
+$x5->deleteCookie();
+
+// uppercase method values route correctly (TUNNEL to a closed port = transport failure, not router error)
+$x6 = new CurlX();
+$x6->custom(url: 'http://127.0.0.1:1/', server: ['method' => 'TUNNEL', 'server' => '127.0.0.1:2']);
+$r = $x6->run();
+check($r->isSuccess() === false && is_string($r->body), 'uppercase TUNNEL routes to proxy, not an exception');
+
 // configurable cache dir
 $tmpDir = sys_get_temp_dir() . "\\curlx_cache_" . uniqid();
 $x4 = new CurlX(['cache_dir' => $tmpDir]);

@@ -29,5 +29,11 @@ if ($path === '/cookie') {
     return;
 }
 
+if ($path === '/set') {
+    header('Set-Cookie: harvested=value; Path=/');
+    echo 'ok';
+    return;
+}
+
 http_response_code(404);
 echo 'not found';
