@@ -6,7 +6,7 @@ $CurlX = new CurlX();
 // Custom request structure with HTTPAUTH
 try {
     $CurlX->custom(
-        url: 'https://luminati.io/api/count_available_ips?customer=CUSTOMER&zone=ZONE',
+        url: 'https://httpbin.org/bearer',
         data: NULL, // your data
         headers: ['Authorization: Bearer API_TOKEN'], // headers
         method: 'GET' // your request method. GET by default

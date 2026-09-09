@@ -6,9 +6,8 @@ CurlX is an HTTP basic library written in PHP for human beings and has no depend
 ![](https://i.imgur.com/AVwS6kZ.png)
 
 CurlX allows you to send **GET**, **POST**, **PUT**, **DELETE** AND MORE HTTP METHODS. You can add headers, form data, json data,
-and parameters with simple arrays, and access the response data in the same way. You can add an HTTP TUNNEL with PROXY, server ROTATIONS like [LUMINATI][], [APIFY][], [IPVANISH][].
+and parameters with simple arrays, and access the response data in the same way. You can add an HTTP TUNNEL with PROXY, server ROTATIONS like [APIFY][], [IPVANISH][].
 
-[LUMINATI]: https://luminati.io/
 [APIFY]: https://apify.com/
 [IPVANISH]: https://www.ipvanish.com/
 
@@ -35,14 +34,6 @@ HTTP TUNNEL SYNTAX
 $server = [
     "method" => "tunnel",
     "server" => "47.254.145.99:3128"
-];
-
-# LIMINATI valid syntax example
-$session => mt_rand();
-$server = [
-    "method" => "custom",
-    "server" = "http://zproxy.lum-superproxy.io:22225",
-    "auth" => "lum-customer-hl_876f552a-zone-static-route_err-pass_dyn-country-RU-session-$session:my_ultra_secret_password"
 ];
 
 # APIFY valid syntax example
@@ -191,7 +182,7 @@ Features
 --------
 
 - International Domains and URLs
-- Custom Tunnel Http with Proxy, Socks, Luminati, Apify, IpVanish
+- Custom Tunnel Http with Proxy, Socks, Apify, IpVanish
 - Cookie data re-utilization
 - Custom HTTP METHODS
 
