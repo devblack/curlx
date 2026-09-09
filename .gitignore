@@ -1,6 +1,7 @@
 .vscode/
 .idea/
 test.*
+!tests/test.php
 
 CurlX_dev.bak
 

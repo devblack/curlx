@@ -23,7 +23,7 @@ $CurlX->get("https://api.myip.com/");
 $CurlX->post("https://api.myip.com/", "my_form_id=test&hello=mom");
 
 # CUSTOM
-$CurlX->custom("https://api.myip.com/", "HEAD");
+$CurlX->custom(url: "https://api.myip.com/", method: "HEAD");
 $CurlX->run();
 ```
 
@@ -177,10 +177,15 @@ Other functions
 ```
 
 More?
---------
+-------
 - More examples in [examples][] dir.
 
 [examples]: https://github.com/devblack/curlx/tree/master/examples
+
+Testing
+-------
+
+    php tests\test.php
 
 Features
 --------

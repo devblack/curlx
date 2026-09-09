@@ -15,7 +15,7 @@ class Helper {
             }
         }
 
-        return [$raw['0'] ??= $raw['0'], $http_headers];
+        return [$raw[0] ?? '', $http_headers];
     }
 
     public function parseArray(array $raw) : array
@@ -57,19 +57,10 @@ class Response {
         private readonly bool  $success = false,
         private readonly int   $status_code = 200,
         private readonly array $headers = [],
-        public                 $body = null {
-            get {
-                return $this->body;
-            }
-        },
-        private                $reason = null {
-            get {
-                return $this->reason;
-            }
-        }
+        public                 $body = null
     ) {}
 
-    public function isSuccess(): int
+    public function isSuccess(): bool
     {
         return $this->success;
     }
@@ -194,7 +185,7 @@ class CurlX extends Helper
             if (false === @touch($fullPath)) {
                 throw new CurlException("Failed to create cookie file: $fullPath");
             }
-            chmod($fullPath, 0644);
+            chmod($fullPath, 0600);
 
             if ($file_name instanceof CookieJarInterface) {
                 $file_name->setFileName($fullPath)->save();
@@ -309,7 +300,7 @@ class CurlX extends Helper
      * @return void
      * @throws CurlException
      */
-    public function custom(string $url, string|array|null $data, ?array $headers, string|CookieJarInterface|null $cookie = null, ?array $server = null, string $method='GET') : void
+    public function custom(string $url, string|array|null $data = null, ?array $headers = null, string|CookieJarInterface|null $cookie = null, ?array $server = null, string $method='GET') : void
     {
         $this->prepareHandle($url);
 
@@ -334,7 +325,7 @@ class CurlX extends Helper
         $this->info = curl_getinfo($this->ch);
 
         // Request failed
-        if (!$this->body) {
+        if ($this->body === false) {
             $this->error_code = curl_errno($this->ch);
             $this->error_string = curl_error($this->ch);
 
@@ -437,7 +428,7 @@ class CookieJar implements CookieJarInterface {
     }
 
     public function setFileName(string $filename): self {
-        $this->filename = realpath(dirname($filename)) . DIRECTORY_SEPARATOR . basename($filename);
+        $this->filename = dirname($filename) . DIRECTORY_SEPARATOR . basename($filename);
         return $this;
     }
 
