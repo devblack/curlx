@@ -79,7 +79,7 @@ class Response {
 class CurlX extends Helper
 {
     private array $default = [
-        CURLOPT_USERAGENT => 'CurlX v2.0.1b (Created by @d3vbl4ck)',
+        CURLOPT_USERAGENT => 'CurlX v2.1.0 (Created by @d3vbl4ck)',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HEADER         => false,
         CURLINFO_HEADER_OUT    => true,

@@ -1,4 +1,4 @@
-CurlX v2.0.1b
+CurlX v2.1.0
 ================
 
 CurlX is an HTTP basic library written in PHP for human beings and has no dependencies, working with PHP 8.2+.
